@@ -25,7 +25,7 @@ IR_sensor = InfraredSensor(Port.S4)
 
 # Initialize the pixycam.
 pixycam = I2CDevice(Port.S3, 0x54)
-lampOn= [174, 193, 22, 2, 0, 0]
+lampOn= [174, 193, 22, 2, 1, 0]
 
 
 pixycam.write(0, bytes(lampOn))
@@ -168,7 +168,13 @@ def green_decision():
 
 # Start following the line endlessly.
 while True:
-    res_kit()
+    #res_kit()
+    while True:
+        data = [174, 193, 32, 2, 1, 1]
+        pixycam.write(0, bytes(data))
+        block = pixycam.read(0, 20)
+        x = block[9]*256 + block[8]
+        print(x)
 
     LL_val = L_line_sensor.reflection()
     RL_val = R_line_sensor.reflection()
