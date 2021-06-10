@@ -110,15 +110,15 @@ def green_decision():
     #reseting the distance
 
 
- ##   #if there was a black line behind the green this means that the robot should ignore it
+#  #   #if there was a black line behind the green this means that the robot should ignore it
 #    while abs(robot.distance()) < 30:
 #        robot.drive(-50,0)
-#        
+       
 #        if L_line_sensor.reflection() < 9 and R_line_sensor.reflection() < 9:
 #            ev3.speaker.play_file(SoundFile.BLACK)
 #            ignore == True
 #            robot.straight(150)
-#
+
 #    while robot.distance()<-1:
 #        robot.drive(50,0)
  
@@ -143,15 +143,7 @@ def green_decision():
         robot.turn(75)
         robot.straight(46)
         return()
-#        straightening(1)
-#        #to go forward until it finds the line
-#        while R_line_sensor.reflection() > 9:
-#            robot.drive(80,0)
-#        robot.straight(10)
-#        robot.turn(75)
-#        while R_line_sensor.reflection() < 18 :
-#            robot.drive(120,0)
-#        return()
+
     
     #Double Green in front ( Turning Back )
     if LL_col == Color.GREEN and RL_col == Color.GREEN:
