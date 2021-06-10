@@ -25,15 +25,23 @@ IR_sensor = InfraredSensor(Port.S4)
 
 # Initialize the pixycam.
 pixycam = I2CDevice(Port.S3, 0x54)
-lampOn= [174, 193, 22, 2, 1, 0]
 
+#byets for turning the lamp on 
+lampOn= [174, 193, 22, 2, 1, 1]
+#byets for turning the lamp off 
+lampOff= [174, 193, 22, 2, 0, 0]
+#byets for askign for sig 1 (already given to the pixy cam with PixyMon software) 
+data = [174, 193, 32, 2, 1, 1]
 
+#indicating the start of program also turning the lamp on for better recognition
+pixycam.write(0, bytes(lampOff))
+wait(5)
 pixycam.write(0, bytes(lampOn))
 
-# Initialize the drive base.
-robot = DriveBase(left_motor, right_motor, wheel_diameter=43, axle_track=174)
+# Initialize the drive base. 174
+robot = DriveBase(left_motor, right_motor, wheel_diameter=60, axle_track=170)
 robot.settings(turn_rate=30)
-
+robot.heading_control.pid()
 
 
 
@@ -52,11 +60,11 @@ def Line_follow(PG, Speed):
 
 
     # Calculate the turn rate.
-    turn_rate = ((LL_val-20 ) - (RL_val -10) )* abs(2.5-(LL_val+RL_val)/100)
+    turn_rate = ((LL_val ) - (RL_val) )* PG
 
     # Set the drive speed at 100 millimeters per second.
-    Drive_speed = Speed - abs(turn_rate) * PG
-    
+    Drive_speed = Speed - (abs(turn_rate) * 2.8)
+    print(turn_rate)
     # Set the drive base speed and turn rate.
     robot.drive(Drive_speed, turn_rate)
 
@@ -160,13 +168,24 @@ def green_decision():
 
 # Start following the line endlessly.
 while True:
+    
+    #code below is used for debuging and to check the value of the light sensors
+    # while True:
+    #     print(R_line_sensor.reflection(), ' ', L_line_sensor.reflection())
+
     #res_kit()
-    while True:
-        data = [174, 193, 32, 2, 1, 1]
-        pixycam.write(0, bytes(data))
-        block = pixycam.read(0, 20)
-        x = block[9]*256 + block[8]
-        print(x)
+    #asking the pixy cam to look for sig 1 (only)
+    pixycam.write(0, bytes(data))
+
+    #checking the return value of pixycam 
+    #cheing the [6] block because thats where the sig is stored 
+    #for more please check pixy's Documentation at this link:
+    #https://docs.pixycam.com/wiki/doku.php?id=wiki:v2:porting_guide#getblocks-sigmap-maxblocks
+    # if  int(pixycam.read(0, 20)[6]) == 1:
+    #     robot.stop()
+    #     ev3.speaker.beep()
+    #     wait(10)
+
 
     LL_val = L_line_sensor.reflection()
     RL_val = R_line_sensor.reflection()
@@ -191,12 +210,11 @@ while True:
             green_decision()
         elif RL_col == Color.BLACK and LL_col == Color.BLACK:
             robot.straight(10)
-       
-    print(IR_sensor.distance())
-    if IR_sensor.distance() < 15 :
-        obstacles()
+
+    # if IR_sensor.distance() < 15 :
+    #     obstacles()
         
 
         
-    Line_follow(2.3,170)
+    Line_follow(0.8,150)
 
