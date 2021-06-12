@@ -41,7 +41,7 @@ pixycam.write(0, bytes(lampOn))
 # Initialize the drive base. 174
 robot = DriveBase(left_motor, right_motor, wheel_diameter=60, axle_track=170)
 robot.settings(turn_rate=30)
-robot.heading_control.pid()
+print(robot.heading_control.pid(1.2,0.01,200,0,0,0))
 
 
 
@@ -60,10 +60,10 @@ def Line_follow(PG, Speed):
 
 
     # Calculate the turn rate.
-    turn_rate = ((LL_val ) - (RL_val) )* PG
+    turn_rate = (LL_val - RL_val) * PG
 
     # Set the drive speed at 100 millimeters per second.
-    Drive_speed = Speed - (abs(turn_rate) * 2.8)
+    Drive_speed = Speed #- (abs(turn_rate) * 2.8)
     print(turn_rate)
     # Set the drive base speed and turn rate.
     robot.drive(Drive_speed, turn_rate)
@@ -216,5 +216,5 @@ while True:
         
 
         
-    Line_follow(0.8,150)
+    Line_follow(1,160)
 
