@@ -1,5 +1,6 @@
 #!/usr/bin/env pybricks-micropython
 
+# For more information and documentation 
 
 from pybricks.ev3devices import InfraredSensor, Motor, ColorSensor
 from pybricks.parameters import Port, Button, Color, ImageFile, SoundFile, Stop
@@ -23,7 +24,7 @@ R_line_sensor = ColorSensor(Port.S1)
 # Initialize the Infrared sensor.
 IR_sensor = InfraredSensor(Port.S4)
 
-# Initialize the pixycam.
+# Initialize the pixycam. 
 pixycam = I2CDevice(Port.S3, 0x54)
 
 #byets for turning the lamp on 
@@ -40,10 +41,10 @@ pixycam.write(0, bytes(lampOn))
 
 # Initialize the drive base. 
 robot = DriveBase(left_motor, right_motor, wheel_diameter=60, axle_track=170)
+#adjusting the turn rate by changing the defult one 
 robot.settings(turn_rate=30)
-#print(robot.heading_control.pid(20,20,20,0,0,0))
 
-# Initializing PID values 
+# Initializing PID values ( we wont be using this in our code but you can use it by activating the line function)
 Error = 0
 Integral = 0
 Derivate = 0
@@ -52,50 +53,68 @@ lastError = 0
 
 # Set the gain of the proportional line controller. This means that for every
 # percentage point of light deviating from the threshold, we set the turn
-# rate of the drivebase to 1.2 degrees per second.
+# rate of the drivebase to 1.2 (example) degrees per second.
 
 # For example, if the light value deviates from the threshold by 10, the robot
 # steers at 10*1.2 = 12 degrees per second.
 
+# input:
+# Pg Proportional gain 
+#speed : speed of the motors mm per second
 
-# def Line_follow(PG, Speed):
-#     # Calculate the deviation from the threshold.
-#     LL_val = L_line_sensor.reflection()
-#     RL_val = R_line_sensor.reflection()
-
-
-#     # Calculate the turn rate.
-#     turn_rate = (LL_val - RL_val) * PG
-
-#     # Set the drive speed at 100 millimeters per second.
-#     Drive_speed = Speed #- (abs(turn_rate) * 2.8)
-#     print(turn_rate)
-#     # Set the drive base speed and turn rate.
-#     robot.drive(Drive_speed, turn_rate)
-def line(kp,ki,kd,Speed):
-    global Integral
-    global lastError
+def Line_follow(PG, Speed):
     # Calculate the deviation from the threshold.
     LL_val = L_line_sensor.reflection()
     RL_val = R_line_sensor.reflection()
 
 
     # Calculate the turn rate.
-    Error = LL_val - RL_val
-    Integral += Error
-    Derivate = lastError - Error 
+    turn_rate = (LL_val - RL_val) * PG
 
-    turn_rate = (Error * kp) + (Integral * ki) + (Derivate * kd)
-    lastError = Error
     # Set the drive speed at 100 millimeters per second.
-    if LL_val < 10 or RL_val < 10 :
-        Drive_speed= -0.04 * Speed
-        turn_rate = turn_rate * 1
-    else:
-        Drive_speed = Speed #- (Speed * (100-((LL_val+RL_val)/2))/100)
+    Drive_speed = Speed #- (abs(turn_rate) * 2.8)
     print(turn_rate)
     # Set the drive base speed and turn rate.
     robot.drive(Drive_speed, turn_rate)
+
+
+
+## The following code it an example of PID controller but we had limited time to program our robot
+## (less than 10 days) and thats why we were not able to fully test and find the best values so we used
+## the code above
+
+# input: 
+# kp : Proportional gain
+# Ki : Integral gain
+# Kd : Derivate gain
+# speed : speed of the motor mm per second
+# output :
+# no out put but when you run it in a loop it follows a line 
+
+# def line(kp,ki,kd,Speed):
+#     global Integral
+#     global lastError
+#     # Calculate the deviation from the threshold.
+#     LL_val = L_line_sensor.reflection()
+#     RL_val = R_line_sensor.reflection()
+
+
+#     # Calculate the turn rate.
+#     Error = LL_val - RL_val
+#     Integral += Error
+#     Derivate = lastError - Error 
+
+#     turn_rate = (Error * kp) + (Integral * ki) + (Derivate * kd)
+#     lastError = Error
+#     # Set the drive speed at 100 millimeters per second.
+#     if LL_val < 10 or RL_val < 10 :
+#         Drive_speed= -0.04 * Speed
+#         turn_rate = turn_rate * 1
+#     else:
+#         Drive_speed = Speed #- (Speed * (100-((LL_val+RL_val)/2))/100)
+#     print(turn_rate)
+#     # Set the drive base speed and turn rate.
+#     robot.drive(Drive_speed, turn_rate)
 
 
 #def pixy2():
@@ -244,10 +263,7 @@ while True:
         
 
         
-    #Line_follow(1,160)
+    Line_follow(2.3,170)
 
-    while True:
-
-        line(.9,0,0,100)
 
 
