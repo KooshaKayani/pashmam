@@ -14,7 +14,7 @@ ev3 = EV3Brick()
 # Initialize the motors.
 left_motor = Motor(Port.D)
 right_motor = Motor(Port.B)
-small_motor = Motor(Port.A)
+#small_motor = Motor(Port.A)
 arm_motor = Motor(Port.C)
 
 # Initialize the color sensor.
@@ -22,7 +22,7 @@ L_line_sensor = ColorSensor(Port.S2)
 R_line_sensor = ColorSensor(Port.S1)
 
 # Initialize the Infrared sensor.
-IR_sensor = InfraredSensor(Port.S4)
+#IR_sensor = InfraredSensor(Port.S4)
 
 # Initialize the pixycam. 
 pixycam = I2CDevice(Port.S3, 0x54)
@@ -37,7 +37,7 @@ data = [174, 193, 32, 2, 1, 1]
 #indicating the start of program also turning the lamp on for better recognition
 pixycam.write(0, bytes(lampOff))
 wait(5)
-pixycam.write(0, bytes(lampOn))
+#pixycam.write(0, bytes(lampOn))
 
 # Initialize the drive base. 
 robot = DriveBase(left_motor, right_motor, wheel_diameter=60, axle_track=170)
@@ -69,11 +69,11 @@ def Line_follow(PG, Speed):
 
 
     # Calculate the turn rate.
-    turn_rate = (LL_val - RL_val) * PG
+    turn_rate = ((LL_val-10 ) - (RL_val -10) )* abs(2.5-(LL_val+RL_val)/100)
 
     # Set the drive speed at 100 millimeters per second.
-    Drive_speed = Speed #- (abs(turn_rate) * 2.8)
-    print(turn_rate)
+    Drive_speed = Speed - abs(turn_rate) * PG
+    
     # Set the drive base speed and turn rate.
     robot.drive(Drive_speed, turn_rate)
 
@@ -117,8 +117,8 @@ def Line_follow(PG, Speed):
 #     robot.drive(Drive_speed, turn_rate)
 
 
-#def pixy2():
-
+def pixy2():
+    
 
 def res_kit():
     small_motor.reset_angle(0)
@@ -222,7 +222,7 @@ while True:
 
     #res_kit()
     #asking the pixy cam to look for sig 1 (only)
-    pixycam.write(0, bytes(data))
+    # pixycam.write(0, bytes(data))
 
     #checking the return value of pixycam 
     #cheing the [6] block because thats where the sig is stored 
@@ -231,7 +231,7 @@ while True:
     # if  int(pixycam.read(0, 20)[6]) == 1:
     #     robot.stop()
     #     ev3.speaker.beep()
-    #     wait(10)
+    #     wait(100)
 
 
     LL_val = L_line_sensor.reflection()
@@ -262,8 +262,8 @@ while True:
     #     obstacles()
         
 
-        
-    Line_follow(2.3,170)
+    while True:    
+        Line_follow(2.3,170)
 
 
 
