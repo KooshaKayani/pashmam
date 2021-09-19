@@ -17,6 +17,7 @@ R_line_sensor = ColorSensor(Port.S2)
 while True:
 	_ = system('clear')
 	print ("Left: ", L_line_sensor.reflection(),"	Right: ", R_line_sensor.reflection())
+	print ("Left RGB: ", L_line_sensor.rgb(),"	Right RGB: ", R_line_sensor.rgb())
 	
 	sleep(0.1)
 
