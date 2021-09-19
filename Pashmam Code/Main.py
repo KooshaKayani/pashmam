@@ -3,7 +3,7 @@
 # For more information and documentation 
 
 from pybricks.ev3devices import InfraredSensor, Motor, ColorSensor
-from pybricks.parameters import Port, Button, Color, ImageFile, SoundFile, Stop
+from pybricks.parameters import Port, Button, Color, SoundFile, Stop
 from pybricks.tools import wait
 from pybricks.robotics import DriveBase
 from pybricks.hubs import EV3Brick 
@@ -37,7 +37,7 @@ data = [174, 193, 32, 2, 1, 1]
 #indicating the start of program also turning the lamp on for better recognition
 pixycam.write(0, bytes(lampOff))
 wait(5)
-#pixycam.write(0, bytes(lampOn))
+pixycam.write(0, bytes(lampOn))
 
 # Initialize the drive base. 
 robot = DriveBase(left_motor, right_motor, wheel_diameter=60, axle_track=170)
@@ -69,7 +69,7 @@ def Line_follow(PG, Speed):
 
 
     # Calculate the turn rate.
-    turn_rate = ((LL_val-10 ) - (RL_val -10) )* abs(2.5-(LL_val+RL_val)/100)
+    turn_rate = ((LL_val-5) - RL_val )* abs(2.5-(LL_val+RL_val)/100)
 
     # Set the drive speed at 100 millimeters per second.
     Drive_speed = Speed - abs(turn_rate) * PG
@@ -118,7 +118,16 @@ def Line_follow(PG, Speed):
 
 
 def pixy2():
-    
+    # Request block
+    bus.write_i2c_block_data(address, 0, data)
+    # Read block
+    block = bus.read_i2c_block_data(address, 0, 20)
+    # Extract data
+    sig = block[7]*256 + block[6]
+    x = block[9]*256 + block[8]
+    y = block[11]*256 + block[10]
+    w = block[13]*256 + block[12]
+    h = block[15]*256 + block[14]
 
 def res_kit():
     small_motor.reset_angle(0)
@@ -220,19 +229,19 @@ while True:
     # while True:
     #     print(R_line_sensor.reflection(), ' ', L_line_sensor.reflection())
 
-    #res_kit()
-    #asking the pixy cam to look for sig 1 (only)
+    # #res_kit()
+    # #asking the pixy cam to look for sig 1 (only)
     # pixycam.write(0, bytes(data))
 
-    #checking the return value of pixycam 
-    #cheing the [6] block because thats where the sig is stored 
-    #for more please check pixy's Documentation at this link:
-    #https://docs.pixycam.com/wiki/doku.php?id=wiki:v2:porting_guide#getblocks-sigmap-maxblocks
-    # if  int(pixycam.read(0, 20)[6]) == 1:
+    # #checking the return value of pixycam 
+    # #cheing the [6] block because thats where the sig is stored 
+    # #for more please check pixy's Documentation at this link:
+    # #https://docs.pixycam.com/wiki/doku.php?id=wiki:v2:porting_guide#getblocks-sigmap-maxblocks
+    # if  int(pixycam.read(0,20)[6]) == 1:
     #     robot.stop()
     #     ev3.speaker.beep()
-    #     wait(100)
-
+    #     pixy2()
+        
 
     LL_val = L_line_sensor.reflection()
     RL_val = R_line_sensor.reflection()
@@ -262,8 +271,8 @@ while True:
     #     obstacles()
         
 
-    while True:    
-        Line_follow(2.3,170)
+    
+    Line_follow(2.3,170)
 
 
 
