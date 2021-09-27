@@ -19,11 +19,13 @@ global GreenMax #to adjust the range of the green turn
 global GreenMin
 global WhiteMin
 global BlackMax
+global DriveSpeed
 
-GreenMax = 15
-GreenMin = 13
+DriveSpeed = 80
+GreenMax = 16
+GreenMin = 14
 WhiteMin = 40
-BlackMax = 6
+BlackMax = 13
 # Initialize the motors.
 left_motor = Motor(Port.C)
 right_motor = Motor(Port.B)
@@ -32,9 +34,10 @@ right_motor = Motor(Port.B)
 L_line_sensor = ColorSensor(Port.S3)    
 R_line_sensor = ColorSensor(Port.S2)
 
+
 # Initialize the drive base. 
 robot = DriveBase(left_motor, right_motor, wheel_diameter=58, axle_track=120)
-robot.settings(turn_rate=30,straight_speed=30)
+robot.settings(turn_rate=55,straight_speed=30)
 
 
 #this function will be used in a loop to follow the line using custom PID
@@ -43,12 +46,12 @@ robot.settings(turn_rate=30,straight_speed=30)
 def Line_follow(PG, Speed):
     # updates the value of light sensor (the reflection)
     LL_val = L_line_sensor.reflection()
-    RL_val = R_line_sensor.reflection()
+    RL_val = R_line_sensor.reflection()-2
 
 
     # Calculate the turn rate. based on a PID algorithm 
 	# in depth description in the GitHub page ;)
-    turn_rate = ((LL_val-5) - RL_val )* abs(2.5-(LL_val+RL_val)/100)
+    turn_rate = ((LL_val) - RL_val )* abs(2.5-(LL_val+RL_val)/100)
 
     # Set the drive speed at 100 millimeters per second.
     Drive_speed = Speed - abs(turn_rate) * PG
@@ -60,6 +63,7 @@ def Line_follow(PG, Speed):
 
 #turns based on the valuse of green check 
 def GreenTurn():
+	global DriveSpeed
 	global TurnLeft
 	global TurnRight
 	global WhiteMin
@@ -68,20 +72,20 @@ def GreenTurn():
 	#Right Turn
 	
 	if TurnRight == True:
-		while R_line_sensor.reflection() > BlackMax:
-			robot.drive(50,0)
+		while R_line_sensor.reflection() - 2 > BlackMax:
+			robot.drive(DriveSpeed,0)
 		robot.straight(20)
-		robot.turn(58)
-		robot.straight(25)
+		robot.turn(30)
+		#robot.straight(10)
 		return()
 
 	#Left Turn
 	if TurnLeft == True:		
 		while L_line_sensor.reflection() > BlackMax:
-			robot.drive(50,0)
+			robot.drive(DriveSpeed,0)
 		robot.straight(20)
-		robot.turn(-58)
-		robot.straight(25)
+		robot.turn(-30)
+		#robot.straight(10)
 		return()	
 
 #input: null 
@@ -99,7 +103,7 @@ def GreenCheck():
 	robot.straight(1)
 	# updates the value of light sensor (the reflection)
 	LL_val = L_line_sensor.reflection()
-	RL_val = R_line_sensor.reflection()
+	RL_val = R_line_sensor.reflection() - 2
 
 	#to break the function if there was a wrong call
 	if LL_val in range(GreenMin,GreenMax) or RL_val in range(GreenMin,GreenMax):
@@ -132,7 +136,7 @@ while True:
 
 	# updates the value of light sensor (the reflection)
 	LL_val = L_line_sensor.reflection()
-	RL_val = R_line_sensor.reflection()
+	RL_val = R_line_sensor.reflection() - 2 #difference in the sencor value
 	
 	if LL_val in range(GreenMin,GreenMax) or RL_val in range(GreenMin,GreenMax):
 		if GreenCheck() == True:
