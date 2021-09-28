@@ -25,7 +25,7 @@ DriveSpeed = 80
 GreenMax = 16
 GreenMin = 14
 WhiteMin = 40
-BlackMax = 15
+BlackMax = 13
 # Initialize the motors.
 left_motor = Motor(Port.C)
 right_motor = Motor(Port.B)
@@ -72,18 +72,18 @@ def GreenTurn():
 	#Right Turn
 	
 	if TurnRight == True:
-		while R_line_sensor.reflection()  > BlackMax:
+		while R_line_sensor.reflection() > BlackMax:
 			robot.drive(DriveSpeed,0)
-		robot.straight(40)
+		robot.straight(20)
 		robot.turn(30)
 		#robot.straight(10)
 		return()
 
 	#Left Turn
 	if TurnLeft == True:		
-		while L_line_sensor.reflection() > BlackMax:
+		while L_line_sensor.reflection() + 2 > BlackMax:
 			robot.drive(DriveSpeed,0)
-		robot.straight(40)
+		robot.straight(20)
 		robot.turn(-30)
 		#robot.straight(10)
 		return()	
