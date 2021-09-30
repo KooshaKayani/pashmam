@@ -1,9 +1,7 @@
 #!/usr/bin/env pybricks-micropython
 
-# For more information and documentation 
-
-from pybricks.ev3devices import InfraredSensor, Motor, ColorSensor
-from pybricks.parameters import Port, Button, Color, SoundFile, Stop
+from pybricks.ev3devices import InfraredSensor, Motor, ColorSensor , UltrasonicSensor
+from pybricks.parameters import Port, Button, Color, ImageFile, SoundFile, Stop
 from pybricks.tools import wait
 from pybricks.robotics import DriveBase
 from pybricks.hubs import EV3Brick 
@@ -11,65 +9,53 @@ from pybricks.iodevices import I2CDevice
 # Initialize the EV3 Brick.
 ev3 = EV3Brick()
 
+#globlas
+global TurnLeft # (takes less time to process boolean)
+global TurnRight # (takes less time to process boolean)
+
+#Initializing the adjustable values:
+#(some valuse have to be adjusted based on the environment using the test programs)
+global GreenMax #to adjust the range of the green turn 
+global GreenMin
+global WhiteMin
+global BlackMax
+global DriveSpeed
+global ObstacleDis
+
+DriveSpeed = 80
+GreenMax = 16
+GreenMin = 14
+WhiteMin = 40
+BlackMax = 13
+ObstacleDis = 10
 # Initialize the motors.
-left_motor = Motor(Port.D)
+left_motor = Motor(Port.C)
 right_motor = Motor(Port.B)
-#small_motor = Motor(Port.A)
-arm_motor = Motor(Port.C)
-
-# Initialize the color sensor.
-L_line_sensor = ColorSensor(Port.S2)    
-R_line_sensor = ColorSensor(Port.S1)
-
-# Initialize the Infrared sensor.
-#IR_sensor = InfraredSensor(Port.S4)
-
-# Initialize the pixycam. 
-pixycam = I2CDevice(Port.S3, 0x54)
-
-#byets for turning the lamp on 
-lampOn= [174, 193, 22, 2, 1, 1]
-#byets for turning the lamp off 
-lampOff= [174, 193, 22, 2, 0, 0]
-#byets for askign for sig 1 (already given to the pixy cam with PixyMon software) 
-data = [174, 193, 32, 2, 1, 1]
-
-#indicating the start of program also turning the lamp on for better recognition
-pixycam.write(0, bytes(lampOff))
-wait(5)
-pixycam.write(0, bytes(lampOn))
+GrabMotor = Motor(Port.A)
+LiftMotor = Motor(Port.D)
+# Initialize the sensors.
+L_line_sensor = ColorSensor(Port.S3)    
+R_line_sensor = ColorSensor(Port.S2)
+ultra = UltrasonicSensor(Port.S4)
+Infra = InfraredSensor(Port.S1)
 
 # Initialize the drive base. 
-robot = DriveBase(left_motor, right_motor, wheel_diameter=60, axle_track=170)
-#adjusting the turn rate by changing the defult one 
-robot.settings(turn_rate=30)
+robot = DriveBase(left_motor, right_motor, wheel_diameter=58, axle_track=120)
+robot.settings(turn_rate=55,straight_speed=30)
 
-# Initializing PID values ( we wont be using this in our code but you can use it by activating the line function)
-Error = 0
-Integral = 0
-Derivate = 0
 
-lastError = 0
-
-# Set the gain of the proportional line controller. This means that for every
-# percentage point of light deviating from the threshold, we set the turn
-# rate of the drivebase to 1.2 (example) degrees per second.
-
-# For example, if the light value deviates from the threshold by 10, the robot
-# steers at 10*1.2 = 12 degrees per second.
-
-# input:
-# Pg Proportional gain 
-#speed : speed of the motors mm per second
-
+#this function will be used in a loop to follow the line using custom PID
+#input: speed, and prepositional gain
+#output: turns the wheels
 def Line_follow(PG, Speed):
-    # Calculate the deviation from the threshold.
+    # updates the value of light sensor (the reflection)
     LL_val = L_line_sensor.reflection()
-    RL_val = R_line_sensor.reflection()
+    RL_val = R_line_sensor.reflection()-2
 
 
-    # Calculate the turn rate.
-    turn_rate = ((LL_val-5) - RL_val )* abs(2.5-(LL_val+RL_val)/100)
+    # Calculate the turn rate. based on a PID algorithm 
+    # in depth description in the GitHub page ;)
+    turn_rate = ((LL_val) - RL_val )* abs(2.5-(LL_val+RL_val)/100)
 
     # Set the drive speed at 100 millimeters per second.
     Drive_speed = Speed - abs(turn_rate) * PG
@@ -79,200 +65,93 @@ def Line_follow(PG, Speed):
 
 
 
-## The following code it an example of PID controller but we had limited time to program our robot
-## (less than 10 days) and thats why we were not able to fully test and find the best values so we used
-## the code above
+#turns based on the valuse of green check 
+def GreenTurn():
+    global DriveSpeed
+    global TurnLeft
+    global TurnRight
+    global WhiteMin
+    global BlackMax
 
-# input: 
-# kp : Proportional gain
-# Ki : Integral gain
-# Kd : Derivate gain
-# speed : speed of the motor mm per second
-# output :
-# no out put but when you run it in a loop it follows a line 
-
-# def line(kp,ki,kd,Speed):
-#     global Integral
-#     global lastError
-#     # Calculate the deviation from the threshold.
-#     LL_val = L_line_sensor.reflection()
-#     RL_val = R_line_sensor.reflection()
-
-
-#     # Calculate the turn rate.
-#     Error = LL_val - RL_val
-#     Integral += Error
-#     Derivate = lastError - Error 
-
-#     turn_rate = (Error * kp) + (Integral * ki) + (Derivate * kd)
-#     lastError = Error
-#     # Set the drive speed at 100 millimeters per second.
-#     if LL_val < 10 or RL_val < 10 :
-#         Drive_speed= -0.04 * Speed
-#         turn_rate = turn_rate * 1
-#     else:
-#         Drive_speed = Speed #- (Speed * (100-((LL_val+RL_val)/2))/100)
-#     print(turn_rate)
-#     # Set the drive base speed and turn rate.
-#     robot.drive(Drive_speed, turn_rate)
-
-
-def pixy2():
-    # Request block
-    bus.write_i2c_block_data(address, 0, data)
-    # Read block
-    block = bus.read_i2c_block_data(address, 0, 20)
-    # Extract data
-    sig = block[7]*256 + block[6]
-    x = block[9]*256 + block[8]
-    y = block[11]*256 + block[10]
-    w = block[13]*256 + block[12]
-    h = block[15]*256 + block[14]
-
-def res_kit():
-    small_motor.reset_angle(0)
-    arm_motor.reset_angle(0)
-
-    small_motor.run_angle(200,200)
-    arm_motor.run_angle(80,140,Stop.COAST)
-    robot.straight(100)
-    while small_motor.angle() > -10 :
-        small_motor.run(-200)
-    wait(10)
-
-    small_motor.reset_angle(0)
-    small_motor.run_angle(180,230)
-
-    while arm_motor.angle() > 1 :
-        arm_motor.run(-80)
-
-    while small_motor.angle() > 1 :
-        small_motor.run(-200)
-    small_motor.stop()
-
-
-
-def obstacles():
-    while IR_sensor.distance() < 13:
-        robot.drive(-100,0)
-    robot.turn(-76)
-    robot.straight(20)
-    while L_line_sensor.reflection() > 10:
-        robot.drive(90,25)
-    robot.turn(-50)
-
-
-
-#finds how many greens there is so its easier to turn
-def green_decision():
-    ev3.speaker.beep()
-    robot.stop()
-    #re checking the values of the sensors
-    LL_col = L_line_sensor.color()
-    RL_col = R_line_sensor.color()
-    ignore = False
-    #reseting the distance
-
-
-#  #   #if there was a black line behind the green this means that the robot should ignore it
-#    while abs(robot.distance()) < 30:
-#        robot.drive(-50,0)
-       
-#        if L_line_sensor.reflection() < 9 and R_line_sensor.reflection() < 9:
-#            ev3.speaker.play_file(SoundFile.BLACK)
-#            ignore == True
-#            robot.straight(150)
-
-#    while robot.distance()<-1:
-#        robot.drive(50,0)
- 
-
-
-    #Green left in front (Turning Left)
-    if LL_col == Color.GREEN and RL_col != Color.GREEN:
-        #to go forward until it finds the line
-        while L_line_sensor.reflection() > 12:
-            Line_follow(2.3,120)
-        robot.straight(10)
-        robot.turn(-75)
-        robot.straight(46)
+    #Right Turn
+    
+    if TurnRight == True:
+        while R_line_sensor.reflection() > BlackMax:
+            robot.drive(DriveSpeed,0)
+        robot.straight(20)
+        robot.turn(30)
+        #robot.straight(10)
         return()
 
-    #Green Right in front (Turning right)
-    if RL_col == Color.GREEN and LL_col != Color.GREEN:
-        #to go forward until it finds the line
-        while R_line_sensor.reflection() > 9:
-            Line_follow(2.3,120)
-        robot.straight(10)
-        robot.turn(75)
-        robot.straight(46)
-        return()
+    #Left Turn
+    if TurnLeft == True:		
+        while L_line_sensor.reflection() + 2 > BlackMax:
+            robot.drive(DriveSpeed,0)
+        robot.straight(20)
+        robot.turn(-30)
+        #robot.straight(10)
+        return()	
 
-    
-    #Double Green in front ( Turning Back )
-    if LL_col == Color.GREEN and RL_col == Color.GREEN:
-        print(robot.distance())
-        if robot.distance() > 40:
-            robot.turn(160)
-            robot.straight(50)
-            
-        else:
-            robot.straight(50)
-        return()
-    
-    
+#input: null 
+#output : True or False
+#this function will be used to check if there is actually a green box 
+def GreenCheck():
+    global TurnLeft
+    global TurnRight
+    global GreenMin
+    global GreenMax
 
-# Start following the line endlessly.
-while True:
-    
-    #code below is used for debuging and to check the value of the light sensors
-    # while True:
-    #     print(R_line_sensor.reflection(), ' ', L_line_sensor.reflection())
-
-    # #res_kit()
-    # #asking the pixy cam to look for sig 1 (only)
-    # pixycam.write(0, bytes(data))
-
-    # #checking the return value of pixycam 
-    # #cheing the [6] block because thats where the sig is stored 
-    # #for more please check pixy's Documentation at this link:
-    # #https://docs.pixycam.com/wiki/doku.php?id=wiki:v2:porting_guide#getblocks-sigmap-maxblocks
-    # if  int(pixycam.read(0,20)[6]) == 1:
-    #     robot.stop()
-    #     ev3.speaker.beep()
-    #     pixy2()
-        
-
+    TurnLeft = False #reseting the values
+    TurnRight = False #reseting the values
+    #to change the position and decrease the probabilities of an error
+    robot.straight(1)
+    # updates the value of light sensor (the reflection)
     LL_val = L_line_sensor.reflection()
-    RL_val = R_line_sensor.reflection()
+    RL_val = R_line_sensor.reflection() - 2
 
-    if LL_val < 11 and RL_val < 11:
-        #ev3.speaker.play_file(SoundFile.BLACK)
-        robot.reset()
-        robot.straight(8)
-
-
-    #check to see if the reflection is same as a green square 
-    if LL_val in range(14,15) or RL_val in range(13,14):
-        robot.straight(1)
-        
-        
-        #change the mood from reflection to color
-        LL_col = L_line_sensor.color()
-        RL_col = R_line_sensor.color()
-        robot.straight(5)
-        #running the green turn function 
-        if LL_col == Color.GREEN or RL_col == Color.GREEN:
-            green_decision()
-        elif RL_col == Color.BLACK and LL_col == Color.BLACK:
-            robot.straight(10)
-
-    # if IR_sensor.distance() < 15 :
-    #     obstacles()
-        
-
+    #to break the function if there was a wrong call
+    if LL_val in range(GreenMin,GreenMax) or RL_val in range(GreenMin,GreenMax):
+        LL_val = L_line_sensor.color()
+        RL_val = R_line_sensor.color()
+    else:
+        return False
     
-    Line_follow(2.3,170)
+    #Indicating which side to turn 
+    if LL_val == Color.GREEN:
+        TurnLeft = True
+    #Indicating which side to turn 
+    if RL_val == Color.GREEN:
+        TurnRight = True
+    
+    if RL_val == True and LL_val == True :
+        print("x_x") #This only happens when both sensors are on green which can cause problems we can fix it later.
+        return False
+
+    return True
+
+#input None
+#output None
+#description: when this function is called it will try to avoid the obstacle ahead by going around it
+def Obstacle():
+    robot.turn(90)
+    robot.drive(30,30)
+    
+while True:
+    global GreenMin
+    global GreenMax
+    global ObstacleDis
+    #to follow the line
+    Line_follow(1.5,170)
+
+    # updates the value of light sensor (the reflection)
+    LL_val = L_line_sensor.reflection()
+    RL_val = R_line_sensor.reflection() - 2 #difference in the sencor value
+
+    if LL_val in range(GreenMin,GreenMax) or RL_val in range(GreenMin,GreenMax):
+        if GreenCheck() == True:
+            GreenTurn()
+
+    if ultra.distance() <= ObstacleDis:
 
 
 
