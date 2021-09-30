@@ -135,7 +135,7 @@ def GreenCheck():
 def Obstacle():
     robot.turn(90)
     robot.drive(30,30)
-    
+
 while True:
     global GreenMin
     global GreenMax
@@ -152,6 +152,6 @@ while True:
             GreenTurn()
 
     if ultra.distance() <= ObstacleDis:
-
+        Obstacle()
 
 
