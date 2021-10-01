@@ -45,8 +45,8 @@ robot.settings(turn_rate=55,straight_speed=30)
 #output: turns the wheels
 def Line_follow(PG, Speed):
     # updates the value of light sensor (the reflection)
-    LL_val = L_line_sensor.reflection()
-    RL_val = R_line_sensor.reflection()-2
+    LL_val = L_line_sensor.reflection()-3
+    RL_val = R_line_sensor.reflection()
 
 
     # Calculate the turn rate. based on a PID algorithm 
@@ -81,7 +81,7 @@ def GreenTurn():
 
 	#Left Turn
 	if TurnLeft == True:		
-		while L_line_sensor.reflection() + 2 > BlackMax:
+		while L_line_sensor.reflection() > BlackMax:
 			robot.drive(DriveSpeed,0)
 		robot.straight(20)
 		robot.turn(-30)
@@ -103,12 +103,12 @@ def GreenCheck():
 	robot.straight(1)
 	# updates the value of light sensor (the reflection)
 	LL_val = L_line_sensor.reflection()
-	RL_val = R_line_sensor.reflection() - 2
+	RL_val = R_line_sensor.reflection() - 1
 
 	#to break the function if there was a wrong call
 	if LL_val in range(GreenMin,GreenMax) or RL_val in range(GreenMin,GreenMax):
 		LL_val = L_line_sensor.color()
-		RL_val = R_line_sensor.color()
+		RL_val = R_line_sensor.color() 
 	else:
 		return False
 	
@@ -136,7 +136,7 @@ while True:
 
 	# updates the value of light sensor (the reflection)
 	LL_val = L_line_sensor.reflection()
-	RL_val = R_line_sensor.reflection() - 2 #difference in the sencor value
+	RL_val = R_line_sensor.reflection() - 1 #difference in the sencor value
 	
 	if LL_val in range(GreenMin,GreenMax) or RL_val in range(GreenMin,GreenMax):
 		if GreenCheck() == True:
