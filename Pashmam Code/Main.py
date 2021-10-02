@@ -142,19 +142,39 @@ def Obstacle():
 #output None
 #description: to performe the search and rescue of the can 
 def CanGrab():
-    return
+    robot.settings(turn_rate=55,straight_speed=80)
+        ######### Straight grab #########
+    robot.straight(466)
+    GrabMotor.run_angle(1000, -980, then=Stop.HOLD, wait=True)
+    if Infra.distance() < 8 :
+        print("grabing")
+        LiftMotor.run_angle(2000, -230, then=Stop.HOLD, wait=True)
+        while Infra.distance() > 5:
+            robot.drive(30,0)
+        robot.straight(20)
+        robot.stop()
+        LiftMotor.stop()
+        GrabMotor.run_angle(1000, 1000, then=Stop.HOLD, wait=True)
+        robot.straight(-460)
+    else:
+        print("not here")
+        GrabMotor.run_angle(1000, 1000, then=Stop.HOLD, wait=True)
+    ######### END ######### 
+
 
 #input None
 #output None
 #description: to align itself with the silver tape
 def silverAlign():
+    robot.stop()
+    robot.settings(turn_rate=55,straight_speed=80)
     robot.straight(10)
     robot.stop()
     while R_line_sensor.reflection() > 90 :
-        right_motor.run(-60)
+        right_motor.run(-100)
     right_motor.stop()
     while L_line_sensor.reflection() > 90 : # to go past the silver tape
-        left_motor.run(-60)
+        left_motor.run(-100)
     left_motor.stop()
 
     robot.straight(45)
@@ -200,4 +220,4 @@ while True:
         print("Aligning\n")
         silverAlign()
         print("Performing rescue\n")
-
+        CanGrab()
