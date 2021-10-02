@@ -200,7 +200,7 @@ def Obstacle():
 def straightGrab():
     robot.stop()
     robot.settings(turn_rate=55,straight_speed=80)
-    
+
     robot.straight(466) # pushing the can forward if it was in the middle
 
     GrabMotor.run_time(-1000, 2000, then=Stop.HOLD, wait=True) #grabbing it so that the sensor can detect it
@@ -342,22 +342,28 @@ while True:
     Line_follow(1.5,170)
 
     # updates the value of light sensor (the reflection)
-    LL_val = L_line_sensor.reflection() + 2
-    RL_val = R_line_sensor.reflection() + 1 #difference in the sencor value
+    LL_val = L_line_sensor.reflection() + 2 #difference in the sensor value
+    RL_val = R_line_sensor.reflection() + 1 #difference in the sensor value
 
+    #looking for green range of reflection 
     if LL_val in range(GreenMin,GreenMax) or RL_val in range(GreenMin,GreenMax):
         print("might be green\n")
         if GreenCheck() == True:
             print("green detected\n")
             GreenTurn()
 
+    #looking for an obstacle 
     # if ultra.distance() <= ObstacleDis:
     #     print("Obstacle detected\n")
     #     Obstacle()
 
+    #performing the rescue
     if LL_val > 98 or RL_val > 98 :
         print("Aligning\n")
-        silverAlign()
+        silverAlign() # to straighten the robots position 
         print("Detecting the location\n")
         print("Performing rescue\n")
-        CanGrab(location())
+        
+        # CanGrab performs the rescue and the location returns the relative postition of the robot 
+        # in comparison to the evacuation zone
+        CanGrab(location()) 
