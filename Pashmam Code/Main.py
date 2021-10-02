@@ -1,5 +1,4 @@
 #!/usr/bin/env pybricks-micropython
-
 from pybricks.ev3devices import InfraredSensor, Motor, ColorSensor , UltrasonicSensor
 from pybricks.parameters import Port, Button, Color, ImageFile, SoundFile, Stop
 from pybricks.tools import wait
@@ -129,7 +128,8 @@ def GreenCheck():
         TurnRight = True
     
     if RL_val == True and LL_val == True :
-        print("x_x") #This only happens when both sensors are on green which can cause problems we can fix it later.
+        print("x_x") #This only happens when both sensors are on green which can cause problems we can fix it later. 
+        # as this is not in the scope of the current competition 
         return False
 
     return True
@@ -363,7 +363,7 @@ while True:
         silverAlign() # to straighten the robots position 
         print("Detecting the location\n")
         print("Performing rescue\n")
-        
+
         # CanGrab performs the rescue and the location returns the relative postition of the robot 
         # in comparison to the evacuation zone
         CanGrab(location()) 
