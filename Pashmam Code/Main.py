@@ -198,29 +198,39 @@ def Obstacle():
 #output 0 not found 1 found
 #description: making sure that the can is not in the way of the evacuation zone
 def straightGrab():
-        ######### Straight grab #########
-    robot.straight(466)
-    GrabMotor.run_time(-1000, 2000, then=Stop.HOLD, wait=True)
-    print(Infra.distance())
+    robot.stop()
+    robot.settings(turn_rate=55,straight_speed=80)
+    
+    robot.straight(466) # pushing the can forward if it was in the middle
+
+    GrabMotor.run_time(-1000, 2000, then=Stop.HOLD, wait=True) #grabbing it so that the sensor can detect it
+    print("the distance to the nearest object: " ,Infra.distance()) # for debuging 
+
+    # Rescuing if the can is in the arms or continuing to look for it
     if Infra.distance() < 10 :
         print("grabing")
-        LiftMotor.run_time(-2500, 1200, then=Stop.HOLD, wait=True)
+
+        LiftMotor.run_time(-2500, 1200, then=Stop.HOLD, wait=True) #clearing the way for the infrared sensor
+
+        # approaching the evacuation zone
         while Infra.distance() > 2:
             robot.drive(40,0)
-        robot.straight(30)
+        robot.straight(40) # final adjustments
         robot.stop()
-        LiftMotor.stop()
-        wait(1)
+
+        LiftMotor.stop() # letting go if the can 
+
         GrabMotor.run_angle(1000, 1000, then=Stop.HOLD, wait=True)
-        robot.straight(10)
+        robot.straight(10) #final push
         robot.straight(-460)
-        return 1
+        return 1 # the can has been rescued
+
     else:
         print("not here")
         GrabMotor.run_angle(1000, 1000, then=Stop.HOLD, wait=True)
         robot.straight(-200)
         return 0
-    ######### END ######### 
+
 
 
 #input the location of the robot in relative to the zone
@@ -230,20 +240,40 @@ def CanGrab(loc):
     robot.stop()
     robot.settings(turn_rate=55,straight_speed=80)
 
+    #if the zone is in front if the silver tape
     if loc == 0:
+
+        #looking for the can 
         result = straightGrab()
         if result == 0:
+            CanSearchAndGrab()
+            evacuation()
 
+    #if the zone is on the left of the silver tape ( right tile )
     if loc == 1:
+        #moving to the middle of the zone
         robot.turn(-84)
         robot.straight(140)
         robot.turn(84)
-        straightGrab()
+
+        #looking for the can 
+        result = straightGrab()
+        if result == 0:
+            CanSearchAndGrab()
+            evacuation()
+
+    #if the zone is on the left of the silver tape ( left tile )
     if loc == 2:
+        #moving to the middle of the zone
         robot.turn(84)
         robot.straight(140)
         robot.turn(-84)
-        straightGrab()
+
+        #looking for the can 
+        result = straightGrab()
+        if result == 0:
+            CanSearchAndGrab()
+            evacuation()
 #input None
 #output None
 #description: to align itself with the silver tape
