@@ -136,15 +136,40 @@ def GreenCheck():
 
 #input None
 #output None
+#description: turns and looks for the can
+def CanSearchAndGrab():
+    robot.turn(25) #avoid the zone
+
+    #search for the can 
+    while Infra.distance() > 50 :
+        print("distance to the nearest object" ,Infra.distance())
+        robot.drive(15,50)
+    robot.turn(10) #adjustments for th positioning
+
+    robot.stop() # stop the movement
+    robot.reset() # reset the angles 
+
+    # grabbing the can
+    while Infra.distance() > 1:
+        print("Relative distance to the can:", Infra.distance())
+        robot.drive(60,0)
+    robot.straight(50) # Adjustments
+    robot.stop() # stopping the movement 
+    GrabMotor.run_time(-1000, 2000, then=Stop.HOLD, wait=True)
+    # going back to the middle of the zone and getting ready to find the evacuation zone
+    robot.straight(-(robot.distance()))
+
+#input None
+#output None
 #description: when this function is called it will try to avoid the obstacle ahead by going around it
 def Obstacle():
     robot.turn(90)
     robot.drive(30,30)
 
 #input: none
-#output none
+#output 0 not found 1 found
 #description: making sure that the can is not in the way of the evacuation zone
-def straigGrab():
+def straightGrab():
         ######### Straight grab #########
     robot.straight(466)
     GrabMotor.run_time(-1000, 2000, then=Stop.HOLD, wait=True)
@@ -161,9 +186,12 @@ def straigGrab():
         GrabMotor.run_angle(1000, 1000, then=Stop.HOLD, wait=True)
         robot.straight(10)
         robot.straight(-460)
+        return 1
     else:
         print("not here")
         GrabMotor.run_angle(1000, 1000, then=Stop.HOLD, wait=True)
+        robot.straight(-200)
+        return 0
     ######### END ######### 
 
 
@@ -175,17 +203,19 @@ def CanGrab(loc):
     robot.settings(turn_rate=55,straight_speed=80)
 
     if loc == 0:
-        straigGrab()
+        result = straightGrab()
+        if result == 0:
+
     if loc == 1:
         robot.turn(-84)
         robot.straight(140)
         robot.turn(84)
-        straigGrab()
+        straightGrab()
     if loc == 2:
         robot.turn(84)
         robot.straight(140)
         robot.turn(-84)
-        straigGrab()
+        straightGrab()
 #input None
 #output None
 #description: to align itself with the silver tape
