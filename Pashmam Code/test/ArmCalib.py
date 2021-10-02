@@ -19,11 +19,6 @@ LiftMotor = Motor(Port.D)
 left_motor = Motor(Port.C)
 right_motor = Motor(Port.B)
 
-
-
-# Initialize the drive base. 
-robot = DriveBase(left_motor, right_motor, wheel_diameter=58, axle_track=120)
-
 GrabMotor.run_angle(1000, 1000, then=Stop.HOLD, wait=True)
 #GrabMotor.run_angle(1000, 1000, then=Stop.HOLD, wait=True)
 LiftMotor.run_angle(1000, -230, then=Stop.HOLD, wait=True)
