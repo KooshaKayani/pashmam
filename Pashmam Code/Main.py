@@ -36,9 +36,14 @@ LiftMotor = Motor(Port.D)
 # Initialize the sensors.
 L_line_sensor = ColorSensor(Port.S3)    
 R_line_sensor = ColorSensor(Port.S2)
-ultra = UltrasonicSensor(Port.S4)
 Infra = InfraredSensor(Port.S1)
-
+# Initialize the pixycam.
+pixycam = I2CDevice(Port.S4, 0x54)
+lampOn= [174, 193, 22, 2, 0, 0]
+lampOn= [174, 193, 22, 2, 1, 0]
+pixycam.write(0, bytes(lampOn))
+#byets for askign for sig 1 (already given to the pixy cam with PixyMon software) 
+data = [174, 193, 32, 2, 1, 1]
 # Initialize the drive base. 
 robot = DriveBase(left_motor, right_motor, wheel_diameter=58, axle_track=120)
 robot.settings(turn_rate=55,straight_speed=30)
@@ -138,29 +143,42 @@ def Obstacle():
 
 
 
-#input None
+#input the location of the robot in relative to the zone
 #output None
 #description: to performe the search and rescue of the can 
-def CanGrab():
+def CanGrab(loc):
     robot.settings(turn_rate=55,straight_speed=80)
-        ######### Straight grab #########
-    robot.straight(466)
-    GrabMotor.run_angle(1000, -980, then=Stop.HOLD, wait=True)
-    if Infra.distance() < 8 :
-        print("grabing")
-        LiftMotor.run_angle(2000, -230, then=Stop.HOLD, wait=True)
-        while Infra.distance() > 5:
-            robot.drive(30,0)
-        robot.straight(20)
-        robot.stop()
-        LiftMotor.stop()
-        GrabMotor.run_angle(1000, 1000, then=Stop.HOLD, wait=True)
-        robot.straight(-460)
-    else:
-        print("not here")
-        GrabMotor.run_angle(1000, 1000, then=Stop.HOLD, wait=True)
-    ######### END ######### 
 
+    if loc == 0:
+            ######### Straight grab #########
+        robot.straight(466)
+        GrabMotor.run_time(-1000, 2000, then=Stop.HOLD, wait=True)
+        print(Infra.distance())
+        if Infra.distance() < 10 :
+            print("grabing")
+            LiftMotor.run_time(-2500, 1200, then=Stop.HOLD, wait=True)
+            while Infra.distance() > 2:
+                robot.drive(40,0)
+            robot.straight(30)
+            robot.stop()
+            LiftMotor.stop()
+            wait(1)
+            GrabMotor.run_angle(1000, 1000, then=Stop.HOLD, wait=True)
+            robot.straight(10)
+            robot.straight(-460)
+        else:
+            print("not here")
+            GrabMotor.run_angle(1000, 1000, then=Stop.HOLD, wait=True)
+        ######### END ######### 
+    if loc == 1:
+        robot.turn(-84)
+        robot.straight(140)
+        robot.turn(88)
+
+    if loc == 2:
+        robot.turn(84)
+        robot.straight(140)
+        robot.turn(-88)
 
 #input None
 #output None
@@ -193,7 +211,29 @@ def silverAlign():
     while L_line_sensor.reflection() > 80 : # to go past the silver tape
         left_motor.run(60)
     left_motor.stop()
-    
+
+#input: none
+#output: 0 : middle , 1: the right tile, 2: the left tile
+#it will detect the location of the robot by using pixy and comparing the relative location of the evacuation zone
+def location ():
+    # Request block
+    pixycam.write(0, bytes(data))
+    # Read block
+    block = pixycam.read(0,20)
+    # Extract data
+    x = block[9]*256 + block[8]
+
+    print("the zone's x:" ,x)
+
+    if x < 100 :
+        print('In right tile')
+        return 1 
+    if x > 215 :
+        print('In left tile')
+        return 2
+    if x in range(110,205):
+        print("in the middle")
+        return(0)
 
 while True:
     global GreenMin
@@ -212,12 +252,13 @@ while True:
             print("green detected\n")
             GreenTurn()
 
-    if ultra.distance() <= ObstacleDis:
-        print("Obstacle detected\n")
-        Obstacle()
+    # if ultra.distance() <= ObstacleDis:
+    #     print("Obstacle detected\n")
+    #     Obstacle()
 
     if LL_val > 98 or RL_val > 98 :
         print("Aligning\n")
         silverAlign()
+        print("Detecting the location\n")
         print("Performing rescue\n")
-        CanGrab()
+        CanGrab(location())
