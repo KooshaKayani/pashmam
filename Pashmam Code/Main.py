@@ -136,6 +136,45 @@ def Obstacle():
     robot.turn(90)
     robot.drive(30,30)
 
+
+
+#input None
+#output None
+#description: to performe the search and rescue of the can 
+def CanGrab():
+    return
+
+#input None
+#output None
+#description: to align itself with the silver tape
+def silverAlign():
+    robot.straight(10)
+    robot.stop()
+    while R_line_sensor.reflection() > 90 :
+        right_motor.run(-60)
+    right_motor.stop()
+    while L_line_sensor.reflection() > 90 : # to go past the silver tape
+        left_motor.run(-60)
+    left_motor.stop()
+
+    robot.straight(45)
+    robot.stop()
+
+    while R_line_sensor.reflection() < 100 :
+        right_motor.run(-60)
+    right_motor.stop()
+    while L_line_sensor.reflection() < 100 : # to go past the silver tape
+        left_motor.run(-60)
+    left_motor.stop()
+
+    while R_line_sensor.reflection() > 80 :
+        right_motor.run(60)
+    right_motor.stop()
+    while L_line_sensor.reflection() > 80 : # to go past the silver tape
+        left_motor.run(60)
+    left_motor.stop()
+    
+
 while True:
     global GreenMin
     global GreenMax
@@ -148,10 +187,17 @@ while True:
     RL_val = R_line_sensor.reflection() - 2 #difference in the sencor value
 
     if LL_val in range(GreenMin,GreenMax) or RL_val in range(GreenMin,GreenMax):
+        print("might be green\n")
         if GreenCheck() == True:
+            print("green detected\n")
             GreenTurn()
 
     if ultra.distance() <= ObstacleDis:
+        print("Obstacle detected\n")
         Obstacle()
 
+    if LL_val > 98 or RL_val > 98 :
+        print("Aligning\n")
+        silverAlign()
+        print("Performing rescue\n")
 
