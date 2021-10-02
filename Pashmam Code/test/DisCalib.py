@@ -13,13 +13,11 @@ from time import sleep
 ev3 = EV3Brick()
 
 
-ultra = UltrasonicSensor(Port.S4)
 Infra = InfraredSensor(Port.S1)
 
 while True:
 	_ = system('clear')
 	print(
-		"Ultra sonic: " + str(ultra.distance()),"\n",
 		"Infrared: " + str(Infra.distance())
 	)
 	sleep(0.2)
