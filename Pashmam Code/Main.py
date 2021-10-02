@@ -141,45 +141,51 @@ def Obstacle():
     robot.turn(90)
     robot.drive(30,30)
 
+#input: none
+#output none
+#description: making sure that the can is not in the way of the evacuation zone
+def straigGrab():
+        ######### Straight grab #########
+    robot.straight(466)
+    GrabMotor.run_time(-1000, 2000, then=Stop.HOLD, wait=True)
+    print(Infra.distance())
+    if Infra.distance() < 10 :
+        print("grabing")
+        LiftMotor.run_time(-2500, 1200, then=Stop.HOLD, wait=True)
+        while Infra.distance() > 2:
+            robot.drive(40,0)
+        robot.straight(30)
+        robot.stop()
+        LiftMotor.stop()
+        wait(1)
+        GrabMotor.run_angle(1000, 1000, then=Stop.HOLD, wait=True)
+        robot.straight(10)
+        robot.straight(-460)
+    else:
+        print("not here")
+        GrabMotor.run_angle(1000, 1000, then=Stop.HOLD, wait=True)
+    ######### END ######### 
 
 
 #input the location of the robot in relative to the zone
 #output None
 #description: to performe the search and rescue of the can 
 def CanGrab(loc):
+    robot.stop()
     robot.settings(turn_rate=55,straight_speed=80)
 
     if loc == 0:
-            ######### Straight grab #########
-        robot.straight(466)
-        GrabMotor.run_time(-1000, 2000, then=Stop.HOLD, wait=True)
-        print(Infra.distance())
-        if Infra.distance() < 10 :
-            print("grabing")
-            LiftMotor.run_time(-2500, 1200, then=Stop.HOLD, wait=True)
-            while Infra.distance() > 2:
-                robot.drive(40,0)
-            robot.straight(30)
-            robot.stop()
-            LiftMotor.stop()
-            wait(1)
-            GrabMotor.run_angle(1000, 1000, then=Stop.HOLD, wait=True)
-            robot.straight(10)
-            robot.straight(-460)
-        else:
-            print("not here")
-            GrabMotor.run_angle(1000, 1000, then=Stop.HOLD, wait=True)
-        ######### END ######### 
+        straigGrab()
     if loc == 1:
         robot.turn(-84)
         robot.straight(140)
-        robot.turn(88)
-
+        robot.turn(84)
+        straigGrab()
     if loc == 2:
         robot.turn(84)
         robot.straight(140)
-        robot.turn(-88)
-
+        robot.turn(-84)
+        straigGrab()
 #input None
 #output None
 #description: to align itself with the silver tape
@@ -216,23 +222,28 @@ def silverAlign():
 #output: 0 : middle , 1: the right tile, 2: the left tile
 #it will detect the location of the robot by using pixy and comparing the relative location of the evacuation zone
 def location ():
+    robot.stop()
+    robot.settings(turn_rate=55,straight_speed=80)
     # Request block
     pixycam.write(0, bytes(data))
     # Read block
     block = pixycam.read(0,20)
     # Extract data
     x = block[9]*256 + block[8]
-
+    robot.straight(200)
     print("the zone's x:" ,x)
 
-    if x < 100 :
+    if x < 110 :
         print('In right tile')
+        robot.straight(-200)
         return 1 
-    if x > 215 :
+    if x > 205 :
         print('In left tile')
+        robot.straight(-200)
         return 2
     if x in range(110,205):
         print("in the middle")
+        robot.straight(-200)
         return(0)
 
 while True:
@@ -243,8 +254,8 @@ while True:
     Line_follow(1.5,170)
 
     # updates the value of light sensor (the reflection)
-    LL_val = L_line_sensor.reflection()
-    RL_val = R_line_sensor.reflection() - 2 #difference in the sencor value
+    LL_val = L_line_sensor.reflection() + 2
+    RL_val = R_line_sensor.reflection() + 1 #difference in the sencor value
 
     if LL_val in range(GreenMin,GreenMax) or RL_val in range(GreenMin,GreenMax):
         print("might be green\n")
