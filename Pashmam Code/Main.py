@@ -159,6 +159,34 @@ def CanSearchAndGrab():
     # going back to the middle of the zone and getting ready to find the evacuation zone
     robot.straight(-(robot.distance()))
 
+def evacuation():
+    pixycam.write(0, bytes(data)) # Sending the configuration to the pixy cam
+    # for more information check https://docs.pixycam.com/wiki/doku.php?id=wiki:v2:porting_guide#setlamp-upper-lower
+
+    # Turning until the center of the evacuation zone is within the given range
+    while pixycam.read(0,20)[8] not in range(145,160):
+        x = pixycam.read(0,20)*256 + pixycam.read(0,20)[8]
+        print(x)
+        robot.drive(10,-40)
+        pixycam.write(0, bytes(data))
+    robot.turn(10) # Adjusting the alignment
+
+    LiftMotor.run_time(-2500, 1200, then=Stop.HOLD, wait=True) #lifting the can so that the infrared sensor can locate the evacuation zone
+
+    # approaching the evacuation zone
+    while Infra.distance() > 5:
+        robot.drive(50,0)
+    robot.straight(40) #extera adjustments
+
+    robot.stop()
+    LiftMotor.stop() #dropping the can 
+
+    GrabMotor.run_angle(1000, 1000, then=Stop.HOLD, wait=True) #letting go of the can 
+
+    robot.straight(10) #pushing the can 
+
+    robot.straight(-460) #leaving the zone 
+
 #input None
 #output None
 #description: when this function is called it will try to avoid the obstacle ahead by going around it
