@@ -28,17 +28,21 @@ robot = DriveBase(left_motor, right_motor, wheel_diameter=58, axle_track=120)
 robot.settings(turn_rate=55,straight_speed=80)
 
 robot.straight(-300)
+
+robot.turn(150)
+
 #to go out of the rescue zone
 while L_line_sensor.reflection() < 18 or R_line_sensor.reflection() < 18:
-	robot.drive(-70,0)
-robot.stop()
-
-robot.turn(-84)
-
-#to find the line
-while L_line_sensor.reflection() > 12 or R_line_sensor.reflection() > 12:
 	robot.drive(70,0)
 robot.stop()
+robot.straight(50)
+robot.turn(75)
 
+#to find the line
+while L_line_sensor.reflection() > 18 and R_line_sensor.reflection() > 18:
+
+	robot.drive(70,0)
+robot.stop()
+robot.straight(20)
 robot.turn(-30)
 

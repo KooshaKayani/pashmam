@@ -54,7 +54,7 @@ robot.settings(turn_rate=55,straight_speed=30)
 def Line_follow(PG, Speed):
     # updates the value of light sensor (the reflection)
     LL_val = L_line_sensor.reflection()
-    RL_val = R_line_sensor.reflection()-2
+    RL_val = R_line_sensor.reflection()+5
 
 
     # Calculate the turn rate. based on a PID algorithm 
@@ -80,19 +80,21 @@ def GreenTurn():
     #Right Turn
     
     if TurnRight == True:
-        while R_line_sensor.reflection() > BlackMax:
+        while R_line_sensor.reflection()  > BlackMax:
             robot.drive(DriveSpeed,0)
-        robot.straight(20)
+        robot.straight(30)
         robot.turn(30)
+        robot.straight(10)
         #robot.straight(10)
         return()
 
     #Left Turn
     if TurnLeft == True:		
-        while L_line_sensor.reflection() + 2 > BlackMax:
+        while L_line_sensor.reflection()  > BlackMax:
             robot.drive(DriveSpeed,0)
-        robot.straight(20)
+        robot.straight(30)
         robot.turn(-30)
+        robot.straight(10)
         #robot.straight(10)
         return()	
 
@@ -110,8 +112,8 @@ def GreenCheck():
     #to change the position and decrease the probabilities of an error
     robot.straight(1)
     # updates the value of light sensor (the reflection)
-    LL_val = L_line_sensor.reflection()
-    RL_val = R_line_sensor.reflection() - 2
+    LL_val = L_line_sensor.reflection() + 2
+    RL_val = R_line_sensor.reflection() + 2
 
     #to break the function if there was a wrong call
     if LL_val in range(GreenMin,GreenMax) or RL_val in range(GreenMin,GreenMax):
@@ -165,8 +167,7 @@ def evacuation():
 
     # Turning until the center of the evacuation zone is within the given range
     while pixycam.read(0,20)[8] not in range(145,160):
-        x = pixycam.read(0,20)*256 + pixycam.read(0,20)[8]
-        print(x)
+
         robot.drive(10,-40)
         pixycam.write(0, bytes(data))
     robot.turn(10) # Adjusting the alignment
@@ -179,13 +180,12 @@ def evacuation():
     robot.straight(40) #extera adjustments
 
     robot.stop()
+    
     LiftMotor.stop() #dropping the can 
 
     GrabMotor.run_angle(1000, 1000, then=Stop.HOLD, wait=True) #letting go of the can 
-
     robot.straight(10) #pushing the can 
 
-    robot.straight(-460) #leaving the zone 
 
 #input None
 #output None
@@ -249,6 +249,24 @@ def CanGrab(loc):
             CanSearchAndGrab()
             evacuation()
 
+        robot.straight(-300)
+
+        robot.turn(150)
+
+        #to go out of the rescue zone
+        while L_line_sensor.reflection() < 18 or R_line_sensor.reflection() < 18:
+            robot.drive(70,0)
+        robot.stop()
+        robot.straight(50)
+        robot.turn(75)
+
+        #to find the line
+        while L_line_sensor.reflection() > 18 and R_line_sensor.reflection() > 18:
+
+            robot.drive(70,0)
+        robot.stop()
+        robot.straight(20)
+        robot.turn(-30)
     #if the zone is on the left of the silver tape ( right tile )
     if loc == 1:
         #moving to the middle of the zone
@@ -274,6 +292,21 @@ def CanGrab(loc):
         if result == 0:
             CanSearchAndGrab()
             evacuation()
+        robot.straight(-300)
+        #to go out of the rescue zone
+        while L_line_sensor.reflection() < 18 or R_line_sensor.reflection() < 18:
+            robot.drive(-70,0)
+        robot.stop()
+
+        robot.turn(-84)
+
+        #to find the line
+        while L_line_sensor.reflection() > 18 and R_line_sensor.reflection() > 18:
+            print(L_line_sensor.reflection())
+            robot.drive(70,0)
+        robot.stop()
+
+        robot.turn(-40)
 #input None
 #output None
 #description: to align itself with the silver tape
@@ -305,6 +338,9 @@ def silverAlign():
     while L_line_sensor.reflection() > 80 : # to go past the silver tape
         left_motor.run(60)
     left_motor.stop()
+
+    robot.turn(-4)
+    robot.stop()
 
 #input: none
 #output: 0 : middle , 1: the right tile, 2: the left tile
@@ -343,7 +379,7 @@ while True:
 
     # updates the value of light sensor (the reflection)
     LL_val = L_line_sensor.reflection() + 2 #difference in the sensor value
-    RL_val = R_line_sensor.reflection() + 1 #difference in the sensor value
+    RL_val = R_line_sensor.reflection() + 2 #difference in the sensor value
 
     #looking for green range of reflection 
     if LL_val in range(GreenMin,GreenMax) or RL_val in range(GreenMin,GreenMax):
