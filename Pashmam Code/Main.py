@@ -381,8 +381,8 @@ while True:
     Line_follow(1.5,170)
 
     # updates the value of light sensor (the reflection)
-    LL_val = L_line_sensor.reflection() + 1 #difference in the sensor value
-    RL_val = R_line_sensor.reflection() + 1 #difference in the sensor value
+    LL_val = L_line_sensor.reflection() + 2 #difference in the sensor value
+    RL_val = R_line_sensor.reflection() + 2 #difference in the sensor value
 
     #looking for green range of reflection 
     if LL_val in range(GreenMin,GreenMax) or RL_val in range(GreenMin,GreenMax):
