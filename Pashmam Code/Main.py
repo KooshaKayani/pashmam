@@ -53,13 +53,13 @@ robot.settings(turn_rate=55,straight_speed=30)
 #output: turns the wheels
 def Line_follow(PG, Speed):
     # updates the value of light sensor (the reflection)
-    LL_val = L_line_sensor.reflection()
-    RL_val = R_line_sensor.reflection()+5
+    LL_val = L_line_sensor.reflection() 
+    RL_val = R_line_sensor.reflection() 
 
 
     # Calculate the turn rate. based on a PID algorithm 
     # in depth description in the GitHub page ;)
-    turn_rate = ((LL_val) - RL_val )* abs(2.5-(LL_val+RL_val)/100)
+    turn_rate = ((LL_val) - RL_val )* abs(2.6-(LL_val+RL_val)/100)
 
     # Set the drive speed at 100 millimeters per second.
     Drive_speed = Speed - abs(turn_rate) * PG
@@ -84,7 +84,7 @@ def GreenTurn():
             robot.drive(DriveSpeed,0)
         robot.straight(30)
         robot.turn(30)
-        robot.straight(10)
+        robot.straight(15)
         #robot.straight(10)
         return()
 
@@ -94,7 +94,7 @@ def GreenTurn():
             robot.drive(DriveSpeed,0)
         robot.straight(30)
         robot.turn(-30)
-        robot.straight(10)
+        robot.straight(15)
         #robot.straight(10)
         return()	
 
@@ -112,8 +112,8 @@ def GreenCheck():
     #to change the position and decrease the probabilities of an error
     robot.straight(1)
     # updates the value of light sensor (the reflection)
-    LL_val = L_line_sensor.reflection() + 2
-    RL_val = R_line_sensor.reflection() + 2
+    LL_val = L_line_sensor.reflection() + 1
+    RL_val = R_line_sensor.reflection() + 1
 
     #to break the function if there was a wrong call
     if LL_val in range(GreenMin,GreenMax) or RL_val in range(GreenMin,GreenMax):
@@ -172,7 +172,7 @@ def evacuation():
         pixycam.write(0, bytes(data))
     robot.turn(10) # Adjusting the alignment
 
-    LiftMotor.run_time(-2500, 1200, then=Stop.HOLD, wait=True) #lifting the can so that the infrared sensor can locate the evacuation zone
+    LiftMotor.run_time(-3000, 2000, then=Stop.HOLD, wait=True) #lifting the can so that the infrared sensor can locate the evacuation zone
 
     # approaching the evacuation zone
     while Infra.distance() > 5:
@@ -183,6 +183,7 @@ def evacuation():
     
     LiftMotor.stop() #dropping the can 
 
+    GrabMotor.stop()
     GrabMotor.run_angle(1000, 1000, then=Stop.HOLD, wait=True) #letting go of the can 
     robot.straight(10) #pushing the can 
 
@@ -201,13 +202,13 @@ def straightGrab():
     robot.stop()
     robot.settings(turn_rate=55,straight_speed=80)
 
-    robot.straight(466) # pushing the can forward if it was in the middle
+    robot.straight(458) # pushing the can forward if it was in the middle
 
     GrabMotor.run_time(-1000, 2000, then=Stop.HOLD, wait=True) #grabbing it so that the sensor can detect it
     print("the distance to the nearest object: " ,Infra.distance()) # for debuging 
 
     # Rescuing if the can is in the arms or continuing to look for it
-    if Infra.distance() < 10 :
+    if Infra.distance() < 8 :
         print("grabing")
 
         LiftMotor.run_time(-2500, 1200, then=Stop.HOLD, wait=True) #clearing the way for the infrared sensor
@@ -251,7 +252,7 @@ def CanGrab(loc):
 
         robot.straight(-300)
 
-        robot.turn(150)
+        robot.turn(130)
 
         #to go out of the rescue zone
         while L_line_sensor.reflection() < 18 or R_line_sensor.reflection() < 18:
@@ -306,7 +307,9 @@ def CanGrab(loc):
             robot.drive(70,0)
         robot.stop()
 
-        robot.turn(-40)
+        robot.turn(-48)
+        robot.straight(30)
+
 #input None
 #output None
 #description: to align itself with the silver tape
@@ -378,8 +381,8 @@ while True:
     Line_follow(1.5,170)
 
     # updates the value of light sensor (the reflection)
-    LL_val = L_line_sensor.reflection() + 2 #difference in the sensor value
-    RL_val = R_line_sensor.reflection() + 2 #difference in the sensor value
+    LL_val = L_line_sensor.reflection() + 1 #difference in the sensor value
+    RL_val = R_line_sensor.reflection() + 1 #difference in the sensor value
 
     #looking for green range of reflection 
     if LL_val in range(GreenMin,GreenMax) or RL_val in range(GreenMin,GreenMax):
