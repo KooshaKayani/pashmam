@@ -280,7 +280,22 @@ def CanGrab(loc):
         if result == 0:
             CanSearchAndGrab()
             evacuation()
+        robot.straight(-300)
+        #to go out of the rescue zone
+        while L_line_sensor.reflection() < 18 or R_line_sensor.reflection() < 18:
+            robot.drive(-70,0)
+        robot.stop()
 
+        robot.turn(84)
+
+        #to find the line
+        while L_line_sensor.reflection() > 18 and R_line_sensor.reflection() > 18:
+            print(L_line_sensor.reflection())
+            robot.drive(70,0)
+        robot.stop()
+
+        robot.turn(48)
+        robot.straight(30)
     #if the zone is on the left of the silver tape ( left tile )
     if loc == 2:
         #moving to the middle of the zone
