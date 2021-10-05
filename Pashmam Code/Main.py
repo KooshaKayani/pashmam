@@ -5,6 +5,8 @@ from pybricks.tools import wait
 from pybricks.robotics import DriveBase
 from pybricks.hubs import EV3Brick 
 from pybricks.iodevices import I2CDevice
+from time import sleep
+
 # Initialize the EV3 Brick.
 ev3 = EV3Brick()
 
@@ -47,6 +49,17 @@ data = [174, 193, 32, 2, 1, 1]
 robot = DriveBase(left_motor, right_motor, wheel_diameter=58, axle_track=120)
 robot.settings(turn_rate=55,straight_speed=30)
 
+#input none
+#output none
+#description: reset the robot to the first condition 
+def ResetAll():
+    robot.stop()
+    ev3.speaker.play_file(SoundFile.AIRBRAKE)
+    GrabMotor.stop()
+    LiftMotor.stop()
+    GrabMotor.run_angle(-1000,GrabMotor.angle(),then=Stop.HOLD, wait=True)
+    sleep(3)
+    ev3.speaker.play_file(SoundFile.MOTOR_START)
 
 #this function will be used in a loop to follow the line using custom PID
 #input: speed, and prepositional gain

@@ -13,7 +13,6 @@ from time import sleep
 ev3 = EV3Brick()
 
 
-
 GrabMotor = Motor(Port.A)
 LiftMotor = Motor(Port.D)
 # Initialize the motors.
@@ -22,10 +21,20 @@ right_motor = Motor(Port.B)
 
 GrabMotor.run_angle(1000, 1300, then=Stop.HOLD, wait=True)
 #GrabMotor.run_angle(1000, 1000, then=Stop.HOLD, wait=True)
-LiftMotor.run_angle(1000, -230, then=Stop.HOLD, wait=True)
+#LiftMotor.run_angle(1000, -230, then=Stop.HOLD, wait=True)
 #GrabMotor.run_angle(1000, -1000, then=Stop.HOLD, wait=True)
 #GrabMotor.run_angle(1000, 1000, then=Stop.HOLD, wait=True)
 
 
-# while True:
-# 	print(LiftMotor.angle())
+def ResetAll():
+    #robot.stop()
+    ev3.speaker.play_file(SoundFile.AIRBRAKE)
+    GrabMotor.stop()
+    LiftMotor.stop()
+    GrabMotor.run_angle(-1000,GrabMotor.angle(),then=Stop.HOLD, wait=True)
+    sleep(3)
+    ev3.speaker.play_file(SoundFile.MOTOR_START)
+while True:
+    if Button.DOWN in ev3.buttons.pressed():
+        ResetAll()
+
