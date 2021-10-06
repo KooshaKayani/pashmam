@@ -5,8 +5,8 @@
 <ul>
 <li style="font-size: 16px; box-sizing: border-box; margin-top: 0px; caret-color: #24292e; color: #24292e; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji'; margin-bottom: 0px !important;">Motors:&nbsp;
 <ul>
-<li style="font-size: 16px; box-sizing: border-box; margin-top: 0px; caret-color: #24292e; color: #24292e; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji'; margin-bottom: 0px !important;">3 large motors.&nbsp;</li>
-<li style="font-size: 16px; box-sizing: border-box; margin-top: 0px; caret-color: #24292e; color: #24292e; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji'; margin-bottom: 0px !important;">1 small motor.&nbsp;</li>
+<li style="font-size: 16px; box-sizing: border-box; margin-top: 0px; caret-color: #24292e; color: #24292e; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji'; margin-bottom: 0px !important;">3 x Large Motors.&nbsp;</li>
+<li style="font-size: 16px; box-sizing: border-box; margin-top: 0px; caret-color: #24292e; color: #24292e; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji'; margin-bottom: 0px !important;">1 x Small Motor.&nbsp;</li>
 </ul>
 </li>
 <li style="font-size: 16px; box-sizing: border-box; margin-top: 0px; caret-color: #24292e; color: #24292e; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji'; margin-bottom: 0px !important;">Sensors:&nbsp;
