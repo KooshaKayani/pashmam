@@ -11,9 +11,9 @@
 </li>
 <li style="font-size: 16px; box-sizing: border-box; margin-top: 0px; caret-color: #24292e; color: #24292e; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji'; margin-bottom: 0px !important;">Sensors:&nbsp;
 <ul>
-<li style="font-size: 16px; box-sizing: border-box; margin-top: 0px; caret-color: #24292e; color: #24292e; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji'; margin-bottom: 0px !important;">2 reflection / color sensors.&nbsp;</li>
-<li style="font-size: 16px; box-sizing: border-box; margin-top: 0px; caret-color: #24292e; color: #24292e; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji'; margin-bottom: 0px !important;">1 infread sensor.&nbsp;</li>
-<li style="font-size: 16px; box-sizing: border-box; margin-top: 0px; caret-color: #24292e; color: #24292e; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji'; margin-bottom: 0px !important;">1 pixycam2.</li>
+<li style="font-size: 16px; box-sizing: border-box; margin-top: 0px; caret-color: #24292e; color: #24292e; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji'; margin-bottom: 0px !important;">2 x Reflection/Colour Sensors.&nbsp;</li>
+<li style="font-size: 16px; box-sizing: border-box; margin-top: 0px; caret-color: #24292e; color: #24292e; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji'; margin-bottom: 0px !important;">1 x Infrared Sensor.&nbsp;</li>
+<li style="font-size: 16px; box-sizing: border-box; margin-top: 0px; caret-color: #24292e; color: #24292e; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji'; margin-bottom: 0px !important;">1 x Pixycam2.</li>
 </ul>
 </li>
 </ul>
