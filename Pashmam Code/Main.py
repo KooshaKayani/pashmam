@@ -205,7 +205,10 @@ def evacuation():
 #description: when this function is called it will try to avoid the obstacle ahead by going around it
 def Obstacle():
     robot.turn(90)
-    robot.drive(30,30)
+    while R_line_sensor.reflection() > BlackMax:
+        robot.drive(30,-10)
+    print("line detected\n")
+    robot.turn(30)
 
 #input: none
 #output 0 not found 1 found
@@ -422,9 +425,9 @@ while True:
             GreenTurn()
 
     #looking for an obstacle 
-    # if ultra.distance() <= ObstacleDis:
-    #     print("Obstacle detected\n")
-    #     Obstacle()
+    if Infra.distance() <= ObstacleDis:
+        print("Obstacle detected\n")
+        Obstacle()
 
     #performing the rescue
     if LL_val > 98 or RL_val > 98 :
