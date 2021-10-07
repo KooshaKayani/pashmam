@@ -50,16 +50,15 @@ robot = DriveBase(left_motor, right_motor, wheel_diameter=58, axle_track=120)
 robot.settings(turn_rate=55,straight_speed=30)
 
 #input none
-#output none
+#output True if the robot was reset and false if it was not
 #description: reset the robot to the first condition 
-def ResetAll():
-    robot.stop()
-    ev3.speaker.play_file(SoundFile.AIRBRAKE)
-    GrabMotor.stop()
-    LiftMotor.stop()
-    GrabMotor.run_angle(-1000,GrabMotor.angle(),then=Stop.HOLD, wait=True)
-    sleep(3)
+sleep(1)
+if Button.DOWN in ev3.buttons.pressed():
+    GrabMotor.run_angle(1000,1300,then=Stop.HOLD, wait=True)
+    
+else:
     ev3.speaker.play_file(SoundFile.MOTOR_START)
+
 
 #this function will be used in a loop to follow the line using custom PID
 #input: speed, and prepositional gain
@@ -123,7 +122,7 @@ def GreenCheck():
     TurnLeft = False #reseting the values
     TurnRight = False #reseting the values
     #to change the position and decrease the probabilities of an error
-    robot.straight(1)
+    robot.straight(3)
     # updates the value of light sensor (the reflection)
     LL_val = L_line_sensor.reflection() + 1
     RL_val = R_line_sensor.reflection() + 1
@@ -215,7 +214,7 @@ def straightGrab():
     robot.stop()
     robot.settings(turn_rate=55,straight_speed=80)
 
-    robot.straight(458) # pushing the can forward if it was in the middle
+    robot.straight(450) # pushing the can forward if it was in the middle
 
     GrabMotor.run_time(-1000, 2000, then=Stop.HOLD, wait=True) #grabbing it so that the sensor can detect it
     print("the distance to the nearest object: " ,Infra.distance()) # for debuging 
@@ -293,6 +292,8 @@ def CanGrab(loc):
         if result == 0:
             CanSearchAndGrab()
             evacuation()
+
+
         robot.straight(-300)
         #to go out of the rescue zone
         while L_line_sensor.reflection() < 18 or R_line_sensor.reflection() < 18:
@@ -408,6 +409,7 @@ while True:
     #to follow the line
     Line_follow(1.5,170)
 
+
     # updates the value of light sensor (the reflection)
     LL_val = L_line_sensor.reflection() + 2 #difference in the sensor value
     RL_val = R_line_sensor.reflection() + 2 #difference in the sensor value
@@ -428,9 +430,11 @@ while True:
     if LL_val > 98 or RL_val > 98 :
         print("Aligning\n")
         silverAlign() # to straighten the robots position 
+
         print("Detecting the location\n")
         print("Performing rescue\n")
 
         # CanGrab performs the rescue and the location returns the relative postition of the robot 
         # in comparison to the evacuation zone
         CanGrab(location()) 
+
