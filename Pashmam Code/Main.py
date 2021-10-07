@@ -28,7 +28,7 @@ GreenMax = 16
 GreenMin = 14
 WhiteMin = 40
 BlackMax = 13
-ObstacleDis = 10
+ObstacleDis = 15
 # Initialize the motors.
 left_motor = Motor(Port.C)
 right_motor = Motor(Port.B)
@@ -204,9 +204,15 @@ def evacuation():
 #output None
 #description: when this function is called it will try to avoid the obstacle ahead by going around it
 def Obstacle():
-    robot.turn(90)
+    robot.stop()
+    robot.settings(turn_rate=55,straight_speed=70)
+    robot.straight(-50)
+    robot.turn(84)
+    robot.straight(150)
+    robot.turn(-84)
+    robot.straight(180)
     while R_line_sensor.reflection() > BlackMax:
-        robot.drive(30,-10)
+        robot.drive(70,-20)
     print("line detected\n")
     robot.turn(30)
 
@@ -217,13 +223,13 @@ def straightGrab():
     robot.stop()
     robot.settings(turn_rate=55,straight_speed=80)
 
-    robot.straight(450) # pushing the can forward if it was in the middle
+    robot.straight(448) # pushing the can forward if it was in the middle
 
     GrabMotor.run_time(-1000, 2000, then=Stop.HOLD, wait=True) #grabbing it so that the sensor can detect it
     print("the distance to the nearest object: " ,Infra.distance()) # for debuging 
 
     # Rescuing if the can is in the arms or continuing to look for it
-    if Infra.distance() < 8 :
+    if Infra.distance() < 6 :
         print("grabing")
 
         LiftMotor.run_time(-2500, 1200, then=Stop.HOLD, wait=True) #clearing the way for the infrared sensor
