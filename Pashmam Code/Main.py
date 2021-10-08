@@ -27,7 +27,7 @@ DriveSpeed = 80
 GreenMax = 16
 GreenMin = 14
 WhiteMin = 40
-BlackMax = 13
+BlackMax = 12
 ObstacleDis = 15
 # Initialize the motors.
 left_motor = Motor(Port.C)
@@ -40,7 +40,7 @@ R_line_sensor = ColorSensor(Port.S2)
 Infra = InfraredSensor(Port.S1)
 # Initialize the pixycam.
 pixycam = I2CDevice(Port.S4, 0x54)
-lampOn= [174, 193, 22, 2, 0, 0]
+lampOff= [174, 193, 22, 2, 0, 0]
 lampOn= [174, 193, 22, 2, 1, 0]
 pixycam.write(0, bytes(lampOn))
 #byets for askign for sig 1 (already given to the pixy cam with PixyMon software) 
@@ -94,8 +94,8 @@ def GreenTurn():
     if TurnRight == True:
         while R_line_sensor.reflection()  > BlackMax:
             robot.drive(DriveSpeed,0)
-        robot.straight(30)
-        robot.turn(30)
+        robot.straight(10)
+        robot.turn(35)
         robot.straight(15)
         #robot.straight(10)
         return()
@@ -104,8 +104,8 @@ def GreenTurn():
     if TurnLeft == True:		
         while L_line_sensor.reflection()  > BlackMax:
             robot.drive(DriveSpeed,0)
-        robot.straight(30)
-        robot.turn(-30)
+        robot.straight(10)
+        robot.turn(-35)
         robot.straight(15)
         #robot.straight(10)
         return()	
@@ -124,8 +124,8 @@ def GreenCheck():
     #to change the position and decrease the probabilities of an error
     robot.straight(3)
     # updates the value of light sensor (the reflection)
-    LL_val = L_line_sensor.reflection() + 1
-    RL_val = R_line_sensor.reflection() + 1
+    LL_val = L_line_sensor.reflection() +1
+    RL_val = R_line_sensor.reflection() 
 
     #to break the function if there was a wrong call
     if LL_val in range(GreenMin,GreenMax) or RL_val in range(GreenMin,GreenMax):
@@ -155,7 +155,7 @@ def CanSearchAndGrab():
     robot.turn(25) #avoid the zone
 
     #search for the can 
-    while Infra.distance() > 50 :
+    while Infra.distance() > 40 :
         print("distance to the nearest object" ,Infra.distance())
         robot.drive(15,50)
     robot.turn(10) #adjustments for th positioning
@@ -420,8 +420,8 @@ while True:
 
 
     # updates the value of light sensor (the reflection)
-    LL_val = L_line_sensor.reflection() + 2 #difference in the sensor value
-    RL_val = R_line_sensor.reflection() + 2 #difference in the sensor value
+    LL_val = L_line_sensor.reflection()  #difference in the sensor value
+    RL_val = R_line_sensor.reflection()  #difference in the sensor value
 
     #looking for green range of reflection 
     if LL_val in range(GreenMin,GreenMax) or RL_val in range(GreenMin,GreenMax):
