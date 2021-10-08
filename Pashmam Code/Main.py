@@ -28,7 +28,7 @@ GreenMax = 16
 GreenMin = 14
 WhiteMin = 40
 BlackMax = 12
-ObstacleDis = 15
+ObstacleDis = 150
 # Initialize the motors.
 left_motor = Motor(Port.C)
 right_motor = Motor(Port.B)
@@ -37,7 +37,7 @@ LiftMotor = Motor(Port.D)
 # Initialize the sensors.
 L_line_sensor = ColorSensor(Port.S3)    
 R_line_sensor = ColorSensor(Port.S2)
-Infra = InfraredSensor(Port.S1)
+Ultra = UltrasonicSensor(Port.S1)
 # Initialize the pixycam.
 pixycam = I2CDevice(Port.S4, 0x54)
 lampOff= [174, 193, 22, 2, 0, 0]
@@ -155,8 +155,8 @@ def CanSearchAndGrab():
     robot.turn(25) #avoid the zone
 
     #search for the can 
-    while Infra.distance() > 40 :
-        print("distance to the nearest object" ,Infra.distance())
+    while Ultra.distance() > 400 :
+        print("distance to the nearest object" ,Ultra.distance())
         robot.drive(15,50)
     robot.turn(10) #adjustments for th positioning
 
@@ -164,8 +164,8 @@ def CanSearchAndGrab():
     robot.reset() # reset the angles 
 
     # grabbing the can
-    while Infra.distance() > 1:
-        print("Relative distance to the can:", Infra.distance())
+    while Ultra.distance() > 10:
+        print("Relative distance to the can:", Ultra.distance())
         robot.drive(60,0)
     robot.straight(50) # Adjustments
     robot.stop() # stopping the movement 
@@ -187,7 +187,7 @@ def evacuation():
     LiftMotor.run_time(-3000, 2000, then=Stop.HOLD, wait=True) #lifting the can so that the infrared sensor can locate the evacuation zone
 
     # approaching the evacuation zone
-    while Infra.distance() > 5:
+    while Ultra.distance() > 50:
         robot.drive(50,0)
     robot.straight(40) #extera adjustments
 
@@ -226,16 +226,16 @@ def straightGrab():
     robot.straight(448) # pushing the can forward if it was in the middle
 
     GrabMotor.run_time(-1000, 2000, then=Stop.HOLD, wait=True) #grabbing it so that the sensor can detect it
-    print("the distance to the nearest object: " ,Infra.distance()) # for debuging 
+    print("the distance to the nearest object: " ,Ultra.distance()) # for debuging 
 
     # Rescuing if the can is in the arms or continuing to look for it
-    if Infra.distance() < 6 :
+    if Ultra.distance() < 30 :
         print("grabing")
 
         LiftMotor.run_time(-2500, 1200, then=Stop.HOLD, wait=True) #clearing the way for the infrared sensor
 
         # approaching the evacuation zone
-        while Infra.distance() > 2:
+        while Ultra.distance() > 2:
             robot.drive(40,0)
         robot.straight(40) # final adjustments
         robot.stop()
@@ -431,7 +431,7 @@ while True:
             GreenTurn()
 
     #looking for an obstacle 
-    if Infra.distance() <= ObstacleDis:
+    if Ultra.distance() <= ObstacleDis:
         print("Obstacle detected\n")
         Obstacle()
 
