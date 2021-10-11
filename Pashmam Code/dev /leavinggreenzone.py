@@ -27,7 +27,7 @@ Infra = InfraredSensor(Port.S1)
 robot = DriveBase(left_motor, right_motor, wheel_diameter=58, axle_track=120)
 robot.settings(turn_rate=55,straight_speed=80)
 
-robot.straight(-300)
+robot.straight(-300)a
 
 robot.turn(150)
 

@@ -28,7 +28,7 @@ GreenMax = 16
 GreenMin = 14
 WhiteMin = 40
 BlackMax = 12
-ObstacleDis = 15
+ObstacleDis = 40
 # Initialize the motors.
 left_motor = Motor(Port.C)
 right_motor = Motor(Port.B)
@@ -54,11 +54,25 @@ robot.settings(turn_rate=55,straight_speed=30)
 #description: reset the robot to the first condition 
 sleep(1)
 if Button.DOWN in ev3.buttons.pressed():
-    GrabMotor.run_angle(1000,1300,then=Stop.HOLD, wait=True)
+    GrabMotor.run_angle(1000,2000,then=Stop.HOLD, wait=True)
+    sleep(3)
     
 else:
     ev3.speaker.play_file(SoundFile.MOTOR_START)
+def greenFollow(PG, Speed):
+    # Calculate the deviation from the threshold.
+    T_hold = 45
+    RL_val = R_line_sensor.reflection()
 
+
+    # Calculate the turn rate.
+    turn_rate = (T_hold - RL_val )* abs(2.5-(T_hold+RL_val)/100)
+
+    # Set the drive speed at 100 millimeters per second.
+    Drive_speed = Speed - abs(turn_rate) * PG
+    
+    # Set the drive base speed and turn rate.
+    robot.drive(Drive_speed, -turn_rate)
 
 #this function will be used in a loop to follow the line using custom PID
 #input: speed, and prepositional gain
@@ -102,7 +116,7 @@ def GreenTurn():
 
     #Left Turn
     if TurnLeft == True:		
-        while L_line_sensor.reflection()  > BlackMax:
+        while L_line_sensor.reflection()  > BlackMax -2:
             robot.drive(DriveSpeed,0)
         robot.straight(10)
         robot.turn(-35)
@@ -124,7 +138,7 @@ def GreenCheck():
     #to change the position and decrease the probabilities of an error
     robot.straight(3)
     # updates the value of light sensor (the reflection)
-    LL_val = L_line_sensor.reflection() +1
+    LL_val = L_line_sensor.reflection() +2
     RL_val = R_line_sensor.reflection() 
 
     #to break the function if there was a wrong call
@@ -206,15 +220,19 @@ def evacuation():
 def Obstacle():
     robot.stop()
     robot.settings(turn_rate=55,straight_speed=70)
+    GrabMotor.run_angle(1000, -1500, then=Stop.HOLD, wait=False)
     robot.straight(-50)
     robot.turn(84)
-    robot.straight(150)
+    robot.straight(170)
     robot.turn(-84)
-    robot.straight(180)
+    robot.straight(200)
     while R_line_sensor.reflection() > BlackMax:
-        robot.drive(70,-20)
+        robot.drive(70,-15)
     print("line detected\n")
-    robot.turn(30)
+    robot.stop()
+    GrabMotor.run_angle(1000, 100, then=Stop.HOLD, wait=False)
+    GrabMotor.run_angle(1000, 1400, then=Stop.HOLD, wait=False)
+    robot.turn(35)
 
 #input: none
 #output 0 not found 1 found
@@ -271,24 +289,28 @@ def CanGrab(loc):
             CanSearchAndGrab()
             evacuation()
 
-        robot.straight(-300)
 
-        robot.turn(130)
+    robot.straight(-300)
 
-        #to go out of the rescue zone
-        while L_line_sensor.reflection() < 18 or R_line_sensor.reflection() < 18:
-            robot.drive(70,0)
-        robot.stop()
-        robot.straight(50)
-        robot.turn(75)
+    robot.turn(130)
 
-        #to find the line
-        while L_line_sensor.reflection() > 18 and R_line_sensor.reflection() > 18:
+    #to go out of the rescue zone
+    while L_line_sensor.reflection() < 18 or R_line_sensor.reflection() < 18:
+        robot.drive(70,0)
+    robot.stop()
+    robot.straight(20)
+    robot.turn(100)
 
-            robot.drive(70,0)
-        robot.stop()
-        robot.straight(20)
-        robot.turn(-30)
+    #to find the line
+    while L_line_sensor.reflection() < 100 and R_line_sensor.reflection() < 100:
+        greenFollow(1.5,170)
+        
+    robot.stop()
+    robot.straight(40)
+    robot.turn(-40)
+    robot.straight(10)
+
+
     #if the zone is on the left of the silver tape ( right tile )
     if loc == 1:
         #moving to the middle of the zone
@@ -307,6 +329,7 @@ def CanGrab(loc):
         #to go out of the rescue zone
         while L_line_sensor.reflection() < 18 or R_line_sensor.reflection() < 18:
             robot.drive(-70,0)
+        
         robot.stop()
 
         robot.turn(84)
@@ -411,6 +434,12 @@ def location ():
         robot.straight(-200)
         return(0)
 
+def wait_to_run():
+    while True:
+        if Button.DOWN in ev3.buttons.pressed():
+            return
+
+wait_to_run()
 while True:
     global GreenMin
     global GreenMax
@@ -418,9 +447,11 @@ while True:
     #to follow the line
     Line_follow(1.5,170)
 
-
+    if Button.DOWN in ev3.buttons.pressed():
+        wait(5)
+        
     # updates the value of light sensor (the reflection)
-    LL_val = L_line_sensor.reflection()  #difference in the sensor value
+    LL_val = L_line_sensor.reflection() + 2  #difference in the sensor value
     RL_val = R_line_sensor.reflection()  #difference in the sensor value
 
     #looking for green range of reflection 

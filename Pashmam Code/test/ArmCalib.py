@@ -20,7 +20,7 @@ LiftMotor = Motor(Port.D)
 left_motor = Motor(Port.C)
 right_motor = Motor(Port.B)
 
-GrabMotor.run_angle(1000, 1300, then=Stop.HOLD, wait=True)
+GrabMotor.run_angle(1000, 2000, then=Stop.HOLD, wait=True)
 #GrabMotor.run_angle(1000, 1000, then=Stop.HOLD, wait=True)
 LiftMotor.run_angle(1000, -230, then=Stop.HOLD, wait=True)
 #GrabMotor.run_angle(1000, -1000, then=Stop.HOLD, wait=True)
