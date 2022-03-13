@@ -17,7 +17,7 @@ pwmFreq = 100
 GPIO.setup(12, GPIO.OUT)    # PWM1
 GPIO.setup(16, GPIO.OUT)    # DIR1
 
-
+ 
 GPIO.setup(11, GPIO.OUT)    # PWM2
 GPIO.setup(18, GPIO.OUT)    # DIR2
 
