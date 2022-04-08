@@ -15,6 +15,7 @@ Sample rate can be 12,14, 16 or 18
 
 from __future__ import absolute_import, division, print_function, \
                                                     unicode_literals
+from logging.config import valid_ident
 import time
 import os
 
@@ -39,10 +40,26 @@ def main():
 
     adc = ADCPi(0x68, 0x69, 12)
 
+    def volt_cahrt(channel):
+        #transfers volts to chart3
+        val =""
+        loop=int(adc.read_voltage(channel)*10)
+        for i in range(0,loop):
+            val+='#'
+        return val
+
     while True:
 
         # clear the console
         os.system('clear')
+
+        # read from adc channels and print to screen
+        print("Channel 1: " + volt_cahrt(1))
+        print("Channel 2: " + volt_cahrt(2))
+        print("Channel 3: " + volt_cahrt(3))
+        print("Channel 4: " + volt_cahrt(4))
+        print("Channel 5: " + volt_cahrt(5))
+        print("Channel 6: " + volt_cahrt(6))
 
         # read from adc channels and print to screen
         print("Channel 1: %02f" % adc.read_voltage(1))
@@ -51,9 +68,6 @@ def main():
         print("Channel 4: %02f" % adc.read_voltage(4))
         print("Channel 5: %02f" % adc.read_voltage(5))
         print("Channel 6: %02f" % adc.read_voltage(6))
-        print("Channel 7: %02f" % adc.read_voltage(7))
-        print("Channel 8: %02f" % adc.read_voltage(8))
-
         # wait 0.2 seconds before reading the pins again
         time.sleep(0.2)
 
