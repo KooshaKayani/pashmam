@@ -10,7 +10,8 @@ from turtle import delay      # Import sleep from time
 import RPi.GPIO as GPIO     # Import Standard GPIO Module
 # importing the required module
 import matplotlib.pyplot as plt
- 
+from simple_pid import PID
+pid = PID(0.78, 0.1, 0.008, setpoint=0)
 
 try:
 	from ADCPi import ADCPi
@@ -24,7 +25,6 @@ except ImportError:
 	except ImportError:
 		raise ImportError(
 			"Failed to import library from parent folder")
-
 
 GPIO.setmode(GPIO.BOARD)      # Set GPIO mode to BCM
 GPIO.setwarnings(False)
@@ -68,12 +68,13 @@ def runMotor(motor, spd):
 	if spd < 0:
 		spd=spd*-1
 		DIR = GPIO.LOW
+
 	# sending the data to motor driver board.
-	if(motor == "A"):
+	if(motor == "B"):
 		GPIO.output(16, DIR)
 		pwma.ChangeDutyCycle(spd)
 
-	elif(motor == "B"):
+	elif(motor == "A"):
 		GPIO.output(18, DIR)
 		pwmb.ChangeDutyCycle(spd)
 
@@ -112,7 +113,7 @@ def main():
 
 	adc = ADCPi(0x68, 0x69, 12)
 
-	t_end = time.time() + 60 
+	t_end = time.time() + 10
 	line_graph=[]
 	line_graphY=[]
 
@@ -132,18 +133,16 @@ def main():
 		Left_Sensor=(adc.read_voltage(1)*3+adc.read_voltage(2)*2+adc.read_voltage(3))
 		Right_Sensor=(adc.read_voltage(5)+adc.read_voltage(6)*2+adc.read_voltage(7)*3)
 
-		
-		Line_pos= scale(Left_Sensor-Right_Sensor,(0,1.5),(-100,100))
-		
-		MotorA_PWM = scale(Line_pos*0.8,(0,-100),(25,-25))
-		MotorB_PWM = scale(Line_pos*0.8,(0,100),(25,-25))
-
-		line_graph.append(Left_Sensor-Right_Sensor)
+		Line_pos= scale(Left_Sensor-Right_Sensor,(-1.5,1.5),(-100,100))
+		controll = pid(Line_pos)*-1
+		print(Line_pos)
+		print(controll)
+		MotorA_PWM = scale(controll,(0,-100),(27,-27))
+		MotorB_PWM = scale(controll,(0,100),(27,-27))
+		runMotor("A",MotorA_PWM*-1)
+		runMotor("B",MotorB_PWM*-1)
+		#line_graph.append(Left_Sensor-Right_Sensor)
 	
-	for i in line_graph:
-		line_graphY.append(i)
-
-	PID_graph(line_graph,line_graphY,"Change in direction")
 
 
 main()
