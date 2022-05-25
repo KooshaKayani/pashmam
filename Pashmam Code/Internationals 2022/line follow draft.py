@@ -11,7 +11,7 @@ import RPi.GPIO as GPIO     # Import Standard GPIO Module
 # importing the required module
 import matplotlib.pyplot as plt
 from simple_pid import PID
-pid = PID(0.78, 0.1, 0.008, setpoint=0)
+pid = PID(0.7, 0.08, 0.004, setpoint=0)
 
 try:
 	from ADCPi import ADCPi
@@ -113,7 +113,7 @@ def main():
 
 	adc = ADCPi(0x68, 0x69, 12)
 
-	t_end = time.time() + 10
+	t_end = time.time() + 15
 	line_graph=[]
 	line_graphY=[]
 
@@ -122,25 +122,25 @@ def main():
 		os.system('clear')
 
 		# read from adc channels and print to screen
-		print("Channel 1: %02f" % adc.read_voltage(1))
-		print("Channel 2: %02f" % adc.read_voltage(2))
-		print("Channel 3: %02f" % adc.read_voltage(3))
+		print("Channel 1: %02f" % adc.read_voltage(1))#1
+		print("Channel 2: %02f" % adc.read_voltage(2))#5
+		print("Channel 3: %02f" % adc.read_voltage(3))#6
 		#print("Channel 4: %02f" % adc.read_voltage(4))
-		print("Channel 5: %02f" % adc.read_voltage(5))
-		print("Channel 6: %02f" % adc.read_voltage(6))
-		print("Channel 7: %02f" % adc.read_voltage(7))
+		print("Channel 5: %02f" % adc.read_voltage(5))#8
+		print("Channel 6: %02f" % adc.read_voltage(6))#9
+		print("Channel 7: %02f" % adc.read_voltage(7))#13
 
-		Left_Sensor=(adc.read_voltage(1)*3+adc.read_voltage(2)*2+adc.read_voltage(3))
-		Right_Sensor=(adc.read_voltage(5)+adc.read_voltage(6)*2+adc.read_voltage(7)*3)
+		Left_Sensor=(adc.read_voltage(1)*4+adc.read_voltage(2)*2+adc.read_voltage(3))
+		Right_Sensor=(adc.read_voltage(5)+adc.read_voltage(6)*2+adc.read_voltage(7)*4)
 
-		Line_pos= scale(Left_Sensor-Right_Sensor,(-1.5,1.5),(-100,100))
-		controll = pid(Line_pos)*-1
+		Line_pos= scale(Left_Sensor-Right_Sensor,(-2,2),(-100,100))
+		controll = pid(Line_pos)
 		print(Line_pos)
 		print(controll)
-		MotorA_PWM = scale(controll,(0,-100),(27,-27))
-		MotorB_PWM = scale(controll,(0,100),(27,-27))
-		runMotor("A",MotorA_PWM*-1)
-		runMotor("B",MotorB_PWM*-1)
+		MotorA_PWM = scale(controll,(0,-100),(25,-25))
+		MotorB_PWM = scale(controll,(0,100),(25,-25))
+		runMotor("A",MotorA_PWM)
+		runMotor("B",MotorB_PWM)
 		#line_graph.append(Left_Sensor-Right_Sensor)
 	
 
