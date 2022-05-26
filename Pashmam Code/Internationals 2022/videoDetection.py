@@ -19,7 +19,7 @@ size = (frame_width, frame_height)
 # is stored in 'filename.avi' file.
 result = cv2.VideoWriter('filename.avi',
 						cv2.VideoWriter_fourcc(*'MJPG'),
-						10, size)
+						30, size)
 
 
 # Capture frame
