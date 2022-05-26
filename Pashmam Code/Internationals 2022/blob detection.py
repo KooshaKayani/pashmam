@@ -1,8 +1,6 @@
 import cv2
 import numpy as np
-
-import cv2
-import numpy as np
+########## for raspi ########
 cap = cv2.VideoCapture(0)
 
 # Capture frame
