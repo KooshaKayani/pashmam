@@ -1,16 +1,16 @@
 import cv2
 import numpy as np
 ########## for raspi ########
-cap = cv2.VideoCapture(0)
+#cap = cv2.VideoCapture(0)
 
 # Capture frame
-ret, frame = cap.read()
+#ret, frame = cap.read()
 
 frame = cv2.GaussianBlur(frame,(17,17),0)
 img_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
 # apply binary thresholding
-ret, thresh = cv2.threshold(img_gray, 90, 255, cv2.THRESH_BINARY)
+ret, thresh = cv2.threshold(img_gray, 40, 255, cv2.THRESH_BINARY)
 # visualize the binary image
 #cv2.imshow('Binary image', thresh)
 #cv2.waitKey(0)
