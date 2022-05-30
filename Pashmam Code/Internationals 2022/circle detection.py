@@ -42,12 +42,21 @@ for component in zip(contours, hierarchy):
 	if currentHierarchy[3] < 0:
 		cordinatesList.append(y)
 
-cordinatesList.sort()
 
+(contours, hierarchy) = zip(*sorted(zip(contours, hierarchy),
+	key=lambda b:b[1][1], reverse=True))
+i=0
 for component in zip(contours, hierarchy):
+	i+=1
+	M = cv2.moments(component[0])
+	cX = int(M["m10"] / M["m00"])
+	cY = int(M["m01"] / M["m00"])
 	currentContour = component[0]
 	currentHierarchy = component[1]
 	x,y,w,h = cv2.boundingRect(currentContour)
+		# draw the countour number on the image
+	cv2.putText(rawImage, "#{}".format(i + 1), (cX - 20, cY), cv2.FONT_HERSHEY_SIMPLEX,
+		1.0, (255, 255, 255), 2)
 	if currentHierarchy[2] < 0 and y > cordinatesList[-1]:
 		# these are the innermost child components
 		cv2.rectangle(rawImage,(x,y),(x+w,y+h),(0,0,225),3)

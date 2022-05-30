@@ -5,8 +5,11 @@ import numpy as np
 
 # Capture frame
 #ret, frame = cap.read()
+rawImage = cv2.imread('blob.jpg')
 
-frame = cv2.GaussianBlur(frame,(17,17),0)
+frame = cv2.GaussianBlur(rawImage,(17,17),15)
+cv2.imwrite('blured.jpg', frame)
+
 img_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
 # apply binary thresholding
