@@ -1,17 +1,13 @@
-#!/usr/bin/env python
-
 from __future__ import absolute_import, division, print_function, \
 													unicode_literals
-from tkinter import Scale
 import time
 import os
-from turtle import right
-from turtle import delay      # Import sleep from time
+
 import RPi.GPIO as GPIO     # Import Standard GPIO Module
 # importing the required module
-import matplotlib.pyplot as plt
+
 from simple_pid import PID
-pid = PID(0.7, 0.08, 0.004, setpoint=0)
+pid = PID(0.8, 0.13, 0.008, setpoint=0)
 
 try:
 	from ADCPi import ADCPi
@@ -33,8 +29,8 @@ GPIO.setwarnings(False)
 pwmFreq = 100
 
 # Setup Pins for motor controller
-GPIO.setup(12, GPIO.OUT)    # PWM1
-GPIO.setup(16, GPIO.OUT)    # DIR1
+GPIO.setup(12, GPIO.OUT)    # PWM1 blue
+GPIO.setup(16, GPIO.OUT)    # DIR1 yellow
 
 
 GPIO.setup(11, GPIO.OUT)    # PWM2
@@ -91,23 +87,6 @@ def scale (val, src, dst):
 	return result
 
 
-#input x and y axis and the title of the graph
-#output graph
-#to help better debug and analyze data
-def PID_graph(x,y,title):	
-	# plotting the points
-	plt.plot(x, y)
-	
-	# naming the x axis
-	plt.xlabel('x - axis')
-	# naming the y axis
-	plt.ylabel('y - axis')
-	
-	# giving a title to my graph
-	plt.title(title)
-	
-	# function to show the plot
-	plt.show()
 
 def main():
 
@@ -130,8 +109,8 @@ def main():
 		print("Channel 6: %02f" % adc.read_voltage(6))#9
 		print("Channel 7: %02f" % adc.read_voltage(7))#13
 
-		Left_Sensor=(adc.read_voltage(1)*4+adc.read_voltage(2)*2+adc.read_voltage(3))
-		Right_Sensor=(adc.read_voltage(5)+adc.read_voltage(6)*2+adc.read_voltage(7)*4)
+		Left_Sensor=(adc.read_voltage(1)*5+adc.read_voltage(2)*2.5+adc.read_voltage(3))
+		Right_Sensor=(adc.read_voltage(5)+adc.read_voltage(6)*2.5+adc.read_voltage(7)*5)
 
 		Line_pos= scale(Left_Sensor-Right_Sensor,(-2,2),(-100,100))
 		controll = pid(Line_pos)
