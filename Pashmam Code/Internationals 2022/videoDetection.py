@@ -103,4 +103,3 @@ cap.release()
 result.release()
 
 	
-
