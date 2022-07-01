@@ -55,21 +55,27 @@ def main():
 
         # read from adc channels and print to screen
         print("Channel 1: " + volt_cahrt(1))
-        print("Channel 2: " + volt_cahrt(2))
-        print("Channel 3: " + volt_cahrt(3))
-        print("Channel 4: " + volt_cahrt(4))
+        print("Channel 4: " + volt_cahrt(2))
+        print("Channel 2: " + volt_cahrt(3))
+        print("Channel 3: " + volt_cahrt(4))
+        
         print("Channel 5: " + volt_cahrt(5))
         print("Channel 6: " + volt_cahrt(6))
+        print("Channel 8: " + volt_cahrt(7))
+        print("Channel 7: " + volt_cahrt(8))
+        
 
         # read from adc channels and print to screen
-        print("Channel 1: %02f" % adc.read_voltage(1))
-        print("Channel 2: %02f" % adc.read_voltage(2))
-        print("Channel 3: %02f" % adc.read_voltage(3))
-        print("Channel 4: %02f" % adc.read_voltage(4))
-        print("Channel 5: %02f" % adc.read_voltage(5))
-        print("Channel 6: %02f" % adc.read_voltage(6))
+        # print("Channel 1: %02f" % adc.read_voltage(1))
+        # print("Channel 2: %02f" % adc.read_voltage(2))
+        # print("Channel 3: %02f" % adc.read_voltage(3))
+        # print("Channel 4: %02f" % adc.read_voltage(4))
+        # print("Channel 5: %02f" % adc.read_voltage(5))
+        # print("Channel 6: %02f" % adc.read_voltage(6))
+        # print("Channel 7: %02f" % adc.read_voltage(7))
+        # print("Channel 8: %02f" % adc.read_voltage(8))
         # wait 0.2 seconds before reading the pins again
-        time.sleep(0.2)
+        time.sleep(0.5)
 
 if __name__ == "__main__":
     main()
