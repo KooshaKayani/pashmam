@@ -28,7 +28,7 @@ MotorA = gpiozero.PhaseEnableMotor("BOARD12", "BOARD16", pwm=True)
 MotorB = gpiozero.PhaseEnableMotor("BOARD11", "BOARD18", pwm=True)
 
 # PWM Frequency
-pwmFreq = 100
+pwmFreq = 100 
 
 # Setup Pins for motor controller
 # GPIO.setup(12, GPIO.OUT)    # PWM1
