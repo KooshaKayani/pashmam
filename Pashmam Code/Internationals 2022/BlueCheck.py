@@ -47,7 +47,7 @@ class BlueCheck:
                     cv2.rectangle(self.frame,(self.x,self.y),(self.x+self.w,self.y+self.h),(0,255,0),3)   
                     print([self.w,self.cY])
                     
-                    if self.cY > 320:
+                    if self.cY > 370:
                         self.result =  [True,self.cX,self.cY]
                     
 
@@ -56,6 +56,7 @@ class BlueCheck:
                     self.result = [False,0,0]
                 
             cv2.imshow('Rescue kit', self.frame)
+        
 
     def stop(self):
         self.stopped = True

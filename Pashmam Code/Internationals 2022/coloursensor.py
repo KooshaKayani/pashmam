@@ -100,14 +100,22 @@ def MotorRun(motor,speed):
 
 	if motor == 'A':
 		if speed < 0:
-			MotorA.backward(speed*-1)
+			LeftFrontMotor.backward(speed*-1)
+			LeftBackMotor.backward(speed*-1)
+			
 		else:
-			MotorA.forward(speed)
+			LeftFrontMotor.forward(speed)
+			LeftBackMotor.forward(speed)
+
 	if motor == 'B':
 		if speed < 0:
-			MotorB.backward(speed*-1)
+			RightFrontMotor.backward(speed*-1)
+			RightBackMotor.backward(speed*-1)
+
 		else:
-			MotorB.forward(speed)
+			RightFrontMotor.forward(speed)
+			RightBackMotor.forward(speed)
+
 
 
 '''just a little example. you ca run this function to check for green value so you can extract the G from the RGB or something similar if you experienced something that works better the function will return true

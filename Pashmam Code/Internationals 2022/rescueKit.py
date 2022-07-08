@@ -16,7 +16,7 @@ while cap.isOpened():
     # Converts images from BGR to HSV
     blared = cv2.GaussianBlur(frame,(21,21),0)
     hsv = cv2.cvtColor(blared, cv2.COLOR_BGR2HSV)
-    lower_blue = np.array([85,120,90])
+    lower_blue = np.array([85,60,90])
     upper_blue = np.array([125,225,255])
 
     # Here we are defining range of bluecolor in HSV

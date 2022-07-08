@@ -8,7 +8,7 @@ import numpy as np
 # importing the required module
 import gpiozero
 from simple_pid import PID
-pid = PID(1.2, 0.08, 0.004, setpoint=0)
+pid = PID(1, 0.01, 0.008, setpoint=0)
 import time
 try:
 	from ADCPi import ADCPi
@@ -44,12 +44,20 @@ LeftArm.angle = None
 RightArm.angle = None
 CameraServo.angle = None
 boxServo.angle = None
-LeftFrontMotor = gpiozero.PhaseEnableMotor(7, 11, pwm=True)
-RightFrontMotor = gpiozero.PhaseEnableMotor(25,9, pwm=True)
+RightBackMotor = gpiozero.PhaseEnableMotor("BOARD12", "BOARD16", pwm=True)
+LeftBackMotor = gpiozero.PhaseEnableMotor("BOARD11", "BOARD18", pwm=True)
+LeftBackMotor.stop()
+RightBackMotor.stop()
+RightFrontMotor = gpiozero.PhaseEnableMotor(7, 11, pwm=True)
+LeftFrontMotor = gpiozero.PhaseEnableMotor(25,9, pwm=True)
+LeftFrontMotor.stop()
+RightFrontMotor.stop()
 from VideoGet import VideoGet
-
-video_getter = VideoGet(0).start()
-
+global video_getter
+global Rescue_finder
+#video_getter = VideoGet(0).start()
+#frame = video_getter.frame
+#Rescue_finder = BlueCheck(frame).start()
 
 
 #input: null 
@@ -58,6 +66,10 @@ video_getter = VideoGet(0).start()
 def Restart():
 	print("restarting...")
 	video_getter.stop()
+	try:
+		Rescue_finder.stop()
+	except:
+		None
 	Gripper.angle = None
 	LeftArm.angle = None
 	RightArm.angle = None
@@ -67,7 +79,7 @@ def Restart():
 	RightFrontMotor.backward(0)
 	sleep(0.2)
 	sys.stdout.flush() #flushing the buffer
-
+	exit()
 	os.execl(sys.executable, 'python3.7', __file__, *sys.argv[1:])
 
 button.when_pressed = Restart
@@ -136,13 +148,21 @@ def MotorRun(motor,speed):
 	if motor == 'A':
 		if speed < 0:
 			LeftFrontMotor.backward(speed*-1)
+			LeftBackMotor.backward(speed*-1)
+			
 		else:
 			LeftFrontMotor.forward(speed)
+			LeftBackMotor.forward(speed)
+
 	if motor == 'B':
 		if speed < 0:
 			RightFrontMotor.backward(speed*-1)
+			RightBackMotor.backward(speed*-1)
+
 		else:
 			RightFrontMotor.forward(speed)
+			RightBackMotor.forward(speed)
+
 
 #input the error rate , max speed of the motors
 #output speed for each motor
@@ -196,85 +216,92 @@ def Rescue_detector():
 	return False,0,0
 			
 def ResKit_Grab():
-		
+	global video_getter
+	global Rescue_finder
 	# Webcamera no 0 is used to capture the frames
 	rescue = False
 	while rescue == False:	
 		
 		frame = video_getter.frame
-		Kit, cX, cY = Rescue_detector()
-		cv2.imshow('res',frame)
+		Rescue_finder.raw = frame
+		Kit, cX, cY = Rescue_finder.result
 		print(cY)
-		if cY < 298:
-			Error_rate =  (frame.shape[1]/2) -cX
+		Error_rate =  (frame.shape[1]/2) -cX
+		
+		if Error_rate not in range(-50,50) and Error_rate > 0:
+			MotorRun("A",1*0.6)
 			
-			if Error_rate not in range(-50,50) and Error_rate > 0 and Kit == True:
-				MotorRun("B",1*0.6)
-				
-			elif Error_rate not in range(-50,50) and Error_rate < 0 and Kit == True:
-				MotorRun("A",1*0.6)
-				
+		elif Error_rate not in range(-50,50) and Error_rate < 0 :
+			MotorRun("B",1*0.6)
+			
 
-			else:
+		else:
 
-				MotorRun("A",1*0.6)
-				MotorRun("B",1*0.6)
+			MotorRun("A",1*0.5)
+			MotorRun("B",1*0.5)
 				
 
 			
-		elif cY > 298:
-			MotorRun("A",0)
-			MotorRun("B",0)
+		if cY < 450 and cY > 370:
+			LeftFrontMotor.stop()
+			RightFrontMotor.stop()
 			Gripper_control(0)
 			Lift_control(1)
 			sleep(1)
-			rescue == True
+			rescue = True
 			return
 
 def main():
-	
-	MotorRun("A",0)
-	MotorRun("B",0)
+	#global video_getter
+	#global Rescue_finder
+	LeftFrontMotor.stop()
+	RightFrontMotor.stop()
 	sleep(0.1)
-	frame = video_getter.frame
-	Rescue_finder = BlueCheck(frame).start()
+	#frame = video_getter.frame
+	
 
 
 	while True:
-		frame = video_getter.frame
-		Rescue_finder.raw = frame
-		print(Rescue_finder.result)
+		#frame = video_getter.frame
+		#Rescue_finder.raw = frame
+		#print(Rescue_finder.result)
 		# clear the console
 		#os.system('clear')
 		#reading the output form the IR sensors (the furthure the sensor from the line the greater impact)
-		Left_Sensor=(IR_Array.read_voltage(1)*5+IR_Array.read_voltage(4)*3+IR_Array.read_voltage(2)*2.5+IR_Array.read_voltage(3)*0.6)
-		Right_Sensor=(IR_Array.read_voltage(5)*0.6+IR_Array.read_voltage(6)*2.5+IR_Array.read_voltage(8)*3+IR_Array.read_voltage(7)*5)
-		Error_rate= scale(Right_Sensor-Left_Sensor,(-10,10),(-100,100))
+		Left_Sensor=(IR_Array.read_voltage(8)*15+IR_Array.read_voltage(7)*8+IR_Array.read_voltage(6)*3+IR_Array.read_voltage(5))
+		Right_Sensor=(IR_Array.read_voltage(1)+IR_Array.read_voltage(2)*3+IR_Array.read_voltage(3)*8+IR_Array.read_voltage(4)*15)
+		print(Right_Sensor-Left_Sensor)
+		Error_rate= scale(Right_Sensor-Left_Sensor,(-8,10),(-100,100))
 		#getting vaues for each motor to function 
-		LeftFrontMotor , RightFrontMotor = PID_controller(Error_rate,Speed=0.7)
+		LeftMotors , RightMotors = PID_controller(Error_rate,Speed=0.45)
 
 
-		MotorRun("A",LeftFrontMotor*1)
-		MotorRun("B",RightFrontMotor*1)
+		MotorRun("A",LeftMotors)
+		MotorRun("B",RightMotors)
 
 
 
-		# Captures the live stream frame-by-frame
-		if Rescue_finder.result[0] == True:
-			back = time.time() + 1
-			while time.time() < back:
-				MotorRun("A",-0.5)
-				MotorRun("B",-0.5)
+		# # Captures the live stream frame-by-frame
+		# if Rescue_finder.result[0] == True:
+		# 	LeftFrontMotor.stop()
+		# 	RightFrontMotor.stop()
 
-			MotorRun("A",0)
-			MotorRun("B",0)
-			break
+		# 	sleep(0.2)
+		# 	back = time.time() + 2
+		# 	while time.time() < back:
+		# 		MotorRun("A",-0.65)
+		# 		MotorRun("B",-0.65)
+
+		# 	LeftFrontMotor.stop()
+		# 	RightFrontMotor.stop()
+		# 	sleep(0.1)
 		# 	Lift_control(0)
 		# 	sleep(0.5)
 			
 		# 	Gripper_control(1)
-	
+		# 	sleep(0.5)
 		# 	ResKit_Grab()
+		# 	Rescue_finder.result[0] = False
 		# else:
 		# 	None
 
@@ -290,7 +317,4 @@ def main():
 	cv2.destroyAllWindows()
 	video_getter.stop()
 	Rescue_finder.stop()
-
-	
-
 main()

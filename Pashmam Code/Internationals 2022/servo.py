@@ -2,8 +2,8 @@ from gpiozero.pins.pigpio import PiGPIOFactory
 from gpiozero import AngularServo
 from time import sleep
 factory = PiGPIOFactory()
-LeftArm = AngularServo(19, min_angle=0 , max_angle=225,min_pulse_width=0.00046, max_pulse_width=0.00245, pin_factory=factory)
-RightArm = AngularServo(13, min_angle=0 , max_angle=225,min_pulse_width=0.00046, max_pulse_width=0.00245, pin_factory=factory)
+LeftArm = AngularServo(13, min_angle=0 , max_angle=225,min_pulse_width=0.00046, max_pulse_width=0.00245, pin_factory=factory)
+RightArm = AngularServo(19, min_angle=0 , max_angle=225,min_pulse_width=0.00046, max_pulse_width=0.00245, pin_factory=factory)
 Gripper = AngularServo(26, min_angle=0 , max_angle=225,min_pulse_width=0.00046, max_pulse_width=0.00245, pin_factory=factory)
 CameraServo = AngularServo(6, min_angle=0 , max_angle=225,min_pulse_width=0.00046, max_pulse_width=0.00245, pin_factory=factory)
 boxServo = AngularServo(12, min_angle=0 , max_angle=225,min_pulse_width=0.00046, max_pulse_width=0.00245, pin_factory=factory)
@@ -84,15 +84,15 @@ def Grab_Control():
     Lift_control(1)
     Gripper_control(0)
 
-Lift_control(0)
-sleep(1)
+# Lift_control(0)
+# sleep(1)
 Gripper_control(0)
 sleep(1)
-Lift_control(2)
-Gripper.angle =20
-sleep(0.5)
-Gripper.angle =None
-RightArm.angle= None 
+# Lift_control(2)
+# Gripper.angle =20
+# sleep(0.5)
+# Gripper.angle =None
+# RightArm.angle= None 
 #Lift_control(2)
 
 # Gripper_control(0)
