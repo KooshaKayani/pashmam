@@ -14,6 +14,8 @@ import sys
 import numpy as np
 from gpiozero.pins.pigpio import PiGPIOFactory
 from VideoGet import VideoGet
+from ImageDetection import PashmamAI
+ObjectDetection = PashmamAI()
 video_getter = VideoGet(0).start()
 frame = video_getter.frame
 factory = PiGPIOFactory()
@@ -60,115 +62,13 @@ except ImportError:
             "Failed to import library from parent folder")
 
 
-
-
-def Dis_estimate(y):
-    return 1 / (((2.6441*(10**-4))*y)-0.012871)
-
-def Evacuation_zone_finder():
-    raw_image = video_getter.frame
-    raw_image = cv2.rotate(raw_image, cv2.ROTATE_90_CLOCKWISE)
-    try:
-        
-        alpha =1.2
-        beta = 50
-        raw_image = cv2. addWeighted(raw_image, alpha, np.zeros(raw_image.shape, raw_image.dtype), gamma=1.2, beta=beta)
-        gray = cv2.cvtColor(raw_image, cv2.COLOR_RGB2GRAY)
-        blured = cv2.medianBlur(gray, 9)
-        #ret, thresh = cv2.threshold(blured, 90, 255, cv2.THRESH_BINARY)
-        #blured = cv2.medianBlur(gray, 13)
-        blured = cv2.medianBlur(gray, 13)
-        ret, thresh = cv2.threshold(blured, 30, 255, cv2.THRESH_BINARY)
-        edged = cv2.Canny(blured, 190, 255)
-        contours, hierarchy = cv2.findContours(image=edged, mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_NONE)
-        hierarchy = hierarchy[0] 
-        Evacuation_zone= []
-
-        # For each contour, find the bounding rectangle and draw the parent and childe at the bottom
-        maxC = max (contours, key=cv2.contourArea)
-        mx,my,mw,mh = cv2.boundingRect(maxC)
-
-        for component in zip(contours, hierarchy):
-            try:
-
-                M = cv2.moments(component[0])
-                cX = int(M["m10"] / M["m00"])
-                cY = int(M["m01"] / M["m00"])
-                currentContour = component[0]
-                currentHierarchy = component[1]
-                x,y,w,h = cv2.boundingRect(currentContour)
-          
-
-
-                if currentHierarchy[2] < 0 and w*h > 20000 and cY < 160  :
-                    
-                    # these are the innermost child components
-                    cv2.rectangle(raw_image,(x,y),(x+w,y+h),(0,0,0),3)
-                    print(x,y,w,h)
-                    print(Dis_estimate(y))
-                    Evacuation_zone.append([cX,cY])
-
-                elif currentHierarchy[3] < 0 :
-                    # these are the outermost parent components
-                    cv2.rectangle(raw_image,(x,y),(x+w,y+h),(0,255,0),3)   
-
-                elif currentHierarchy[1] < 0:
-                    cv2.rectangle(raw_image,(x,y),(x+w,y+h),(255,255,225),3) 
-
-            except Exception as e:
-                print("problme in evacuation zone finder ",e)
-
-            # draw contours on the original image
-            cv2.drawContours(image=raw_image, contours=contours, contourIdx=-1, color=(255, 0, 0), thickness=1, lineType=cv2.LINE_AA)
-
-        cv2.imshow('output',raw_image)
-        if len(Evacuation_zone) == 1:
-
-            return True, Evacuation_zone
-        return False,[]
-    except:
-        return False,[]
-
-
-def Victim_finder(raw_image):
-    detected_victms = []
-    raw_image = cv2.rotate(raw_image, cv2.ROTATE_90_CLOCKWISE)
-    try:
-        #blared = cv2.GaussianBlur(raw_image,(21,21),0)
-            #adjusting the picture
-        alpha =1.6
-        beta = 50
-        #frame = cv2. addWeighted(raw_image, alpha, np.zeros(raw_image.shape, raw_image.dtype), gamma=1.2, beta=beta)
-        gray = cv2.cvtColor(raw_image, cv2.COLOR_RGB2GRAY)
-        gray = cv2.medianBlur(gray, 9)
-        
-        circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, 1, 20, param1=110, param2=25, minRadius=0, maxRadius=120)
-        detected_circles = np.round(circles[0,:]).astype("int")
-        detected_circles = sorted(detected_circles , key = lambda v: [v[1], v[1]],reverse=True)
-        print(detected_circles)
-        i = 0
-        for (x, y ,r) in detected_circles:
-            if y < 345:
-                i+=1
-                #print(y)
-                cv2.circle(raw_image, (x, y), r, (0, 0, 0), 3)
-                cv2.putText(raw_image, "#{}".format(i), (x , y), cv2.FONT_HERSHEY_SIMPLEX,1.0, (255, 255, 255), 2)
-                aproximate_distance = Dis_estimate(y)
-                detected_victms.append([x,y,aproximate_distance])
-        
-        
-        return detected_victms
-    except Exception as e:
-        print("what the hell", e)
-    return []
-
 def positioning(boundries):
     
     centered = False
     #while centered == False:
     frame = video_getter.frame
 
-    objects = Victim_finder(frame)
+    objects = ObjectDetection.Victim_finder(frame)
     if objects == []:
         return 0 
 
@@ -200,7 +100,7 @@ def approaching():
     while found == False:
         try :
             frame = video_getter.frame
-            objects = Victim_finder(frame)
+            objects = ObjectDetection.Victim_finder(frame)
             print("approaching ",objects[0][2])
             found = True
             Not_found += 1
@@ -314,7 +214,7 @@ while True:
             sleep(0.7)
 
         if Resc_num == 4:
-            while Evacuation_zone_finder()[0] != True:
+            while ObjectDetection.Evacuation_zone_finder(frame)[0] != True:
                 Motors.MotorRun("Right",-0.50)
                 Motors.MotorRun("Left",0.50)
                 sleep(0.45)
@@ -325,9 +225,9 @@ while True:
                 Motors.stopAll()
                 sleep(0.3)
             try:    
-                print(Evacuation_zone_finder())
-                if Evacuation_zone_finder()[0] == True:
-                    ObjectPID = (frame_x_lentgh/2)-Evacuation_zone_finder()[1][0][0]
+                print(ObjectDetection.Evacuation_zone_finder(frame))
+                if ObjectDetection.Evacuation_zone_finder(frame)[0] == True:
+                    ObjectPID = (frame_x_lentgh/2)-ObjectDetection.Evacuation_zone_finder(frame)[1][0][0]
                     if ObjectPID > 36 or ObjectPID < -1* 36:
                         RightFrontMotor_PWM = scale(ObjectPID,((frame_x_lentgh/2),-(frame_x_lentgh/2)),(-0.7,0.7))
                         LeftFrontMotor_PWM = scale(ObjectPID,(-(frame_x_lentgh/2),(frame_x_lentgh/2)),(-0.7,0.7))
